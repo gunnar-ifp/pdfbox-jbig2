@@ -30,9 +30,19 @@ public final class CX
 
     /**
      * @param size - Amount of context values.
+     */
+    public CX(int size)
+    {
+        this.index = 1;
+        cx = new byte[size];
+        mps = new byte[size];
+    }
+
+    /**
+     * @param size - Amount of context values.
      * @param index - Start index.
      */
-    public CX(int size, int index)
+    CX(int size, int index)
     {
         this.index = index;
         cx = new byte[size];

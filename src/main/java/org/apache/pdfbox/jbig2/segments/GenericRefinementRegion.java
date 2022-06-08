@@ -211,7 +211,7 @@ public class GenericRefinementRegion implements Region
 
             if (cx == null)
             {
-                cx = new CX(8192, 1);
+                cx = new CX(8192);
             }
 
             /* 6.3.5.6 - 2) */

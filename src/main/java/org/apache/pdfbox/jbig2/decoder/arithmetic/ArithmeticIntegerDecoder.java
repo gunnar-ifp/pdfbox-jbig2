@@ -51,7 +51,7 @@ public class ArithmeticIntegerDecoder
 
         if (cxIAx == null)
         {
-            cxIAx = new CX(512, 1);
+            cxIAx = new CX(512);
         }
 
         prev = 1;

@@ -196,7 +196,7 @@ public class GenericRegion implements Region
                 }
                 if (cx == null)
                 {
-                    cx = new CX(65536, 1);
+                    cx = new CX(65536);
                 }
 
                 /* 6.2.5.7 - 2) */
