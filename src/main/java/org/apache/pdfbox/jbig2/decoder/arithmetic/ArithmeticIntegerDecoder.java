@@ -27,7 +27,6 @@ public class ArithmeticIntegerDecoder
 
     private final ArithmeticDecoder decoder;
 
-    private int prev;
 
     public ArithmeticIntegerDecoder(ArithmeticDecoder decoder)
     {
@@ -54,39 +53,39 @@ public class ArithmeticIntegerDecoder
             cxIAx = new CX(512);
         }
 
-        prev = 1;
+        int prev = 1;
 
         cxIAx.setIndex(prev);
         s = decoder.decode(cxIAx);
-        setPrev(s);
+        prev = setPrev(prev, s);
 
         cxIAx.setIndex(prev);
         d = decoder.decode(cxIAx);
-        setPrev(d);
+        prev = setPrev(prev, d);
 
         if (d == 1)
         {
             cxIAx.setIndex(prev);
             d = decoder.decode(cxIAx);
-            setPrev(d);
+            prev = setPrev(prev, d);
 
             if (d == 1)
             {
                 cxIAx.setIndex(prev);
                 d = decoder.decode(cxIAx);
-                setPrev(d);
+                prev = setPrev(prev, d);
 
                 if (d == 1)
                 {
                     cxIAx.setIndex(prev);
                     d = decoder.decode(cxIAx);
-                    setPrev(d);
+                    prev = setPrev(prev, d);
 
                     if (d == 1)
                     {
                         cxIAx.setIndex(prev);
                         d = decoder.decode(cxIAx);
-                        setPrev(d);
+                        prev = setPrev(prev, d);
 
                         if (d == 1)
                         {
@@ -127,7 +126,7 @@ public class ArithmeticIntegerDecoder
         {
             cxIAx.setIndex(prev);
             d = decoder.decode(cxIAx);
-            setPrev(d);
+            prev = setPrev(prev, d);
             v = (v << 1) | d;
         }
 
@@ -145,16 +144,10 @@ public class ArithmeticIntegerDecoder
         return Long.MAX_VALUE;
     }
 
-    private void setPrev(int bit)
+    private static int setPrev(int prev, int bit)
     {
-        if (prev < 256)
-        {
-            prev = ((prev << 1) | bit) & 0x1ff;
-        }
-        else
-        {
-            prev = ((((prev << 1) | bit) & 511) | 256) & 0x1ff;
-        }
+//      return (prev << 1 | bit | prev & 0x100) & 0x1ff;
+        return (prev & 0xff) << 1 | prev & 0x100 | bit;
     }
 
     /**
@@ -167,10 +160,10 @@ public class ArithmeticIntegerDecoder
      * 
      * @throws IOException if an underlying IO operation fails
      */
-    public int decodeIAID(CX cxIAID, long symCodeLen) throws IOException
+    public int decodeIAID(CX cxIAID, int symCodeLen) throws IOException
     {
         // A.3 1)
-        prev = 1;
+        int prev = 1;
 
         // A.3 2)
         for (int i = 0; i < symCodeLen; i++)
