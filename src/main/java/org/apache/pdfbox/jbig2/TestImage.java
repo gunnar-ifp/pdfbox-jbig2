@@ -24,6 +24,11 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -38,6 +43,7 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.WindowConstants;
 
 /**
  * This is a utility class. It can be used to show intermediary results.
@@ -46,44 +52,46 @@ public class TestImage extends JFrame
 {
     private static final long serialVersionUID = 7353175320371957550L;
 
-    public static void main(String[] args)
-    {
-        int w = 250;
-        int h = 250;
-
-        // (w+7) / 8 entspricht Aufrundung!
-        int scanlineStride = (w + 7) / 8;
-
-        // hier sind die Daten
-        byte data[] = new byte[h * scanlineStride];
-
-        // dummy-Daten erzeugen
-        for (int i = 0; i < data.length; i++)
-            data[i] = (byte) i;
-
-        new TestImage(data, w, h, scanlineStride);
-    }
-
-    static class ImageComponent extends JComponent
+    static class ImageComponent extends JComponent implements MouseWheelListener, MouseListener, MouseMotionListener
     {
         private static final long serialVersionUID = -5921296548288376287L;
         Image myImage;
-        int imgWidth = -1;
-        int imgHeight = -1;
-        Dimension prefSize = null;
-        private int scale = 1;
+        int x, y, mscale = 0, mx, my;
+        
+        {
+            addMouseListener(this);
+            addMouseMotionListener(this);
+            addMouseWheelListener(this);
+        }
 
-        /**
-         * Constructor for ImageComponent.
-         */
+        
+        @Override public void mouseClicked(MouseEvent e) {}
+        @Override public void mouseEntered(MouseEvent e) {}
+        @Override public void mouseExited(MouseEvent e) {}
+        @Override public void mouseMoved(MouseEvent e) {}
+        @Override public void mouseReleased(MouseEvent e) {}
+        @Override public void mousePressed(MouseEvent e) {
+            x = e.getX();
+            y = e.getY();
+        }
+        @Override public void mouseDragged(MouseEvent e) {
+            mx = Math.min(0, mx + e.getX() - x);
+            my = Math.min(0, my + e.getY() - y);
+            x = e.getX();
+            y = e.getY();
+            repaint();
+        }
+        @Override public void mouseWheelMoved(MouseWheelEvent e) {
+            mscale -= e.getWheelRotation();
+            repaint();
+        }
+        
+
         protected ImageComponent()
         {
             super();
         }
 
-        /**
-         * Constructor for ImageComponent.
-         */
         public ImageComponent(Image image)
         {
             super();
@@ -91,35 +99,7 @@ public class TestImage extends JFrame
         }
 
         /**
-         * Gets the preffered Size of the Component
-         * 
-         * @param image java.awt.Image
-         */
-        public Dimension getPreferredSize()
-        {
-            if (prefSize != null)
-                return this.prefSize;
-            else
-                return super.getPreferredSize();
-        }
-
-        /**
-         * Gets the minimum Size of the Component
-         * 
-         * @param image java.awt.Image
-         */
-        public Dimension getMinimumSize()
-        {
-            if (prefSize != null)
-                return prefSize;
-            else
-                return super.getMinimumSize();
-        }
-
-        /**
          * Sets an image to be shown
-         * 
-         * @param image java.awt.Image
          */
         public void setImage(Image image)
         {
@@ -143,12 +123,6 @@ public class TestImage extends JFrame
                 catch (Exception ex)
                 {
                 }
-
-                imgWidth = myImage.getWidth(this);
-                imgHeight = myImage.getHeight(this);
-
-                setSize(imgWidth * scale, imgHeight * scale);
-                prefSize = getSize();
                 invalidate();
                 validate();
                 repaint();
@@ -156,50 +130,36 @@ public class TestImage extends JFrame
         }
 
         /**
-         * Get the Insets fo the Component
-         * 
-         * @return Insets the Insets of the Component
+         * Returns 1px wide border insets.
          */
+        @Override
         public Insets getInsets()
         {
             return new Insets(1, 1, 1, 1);
         }
 
         /**
-         * Paints the component
-         * 
-         * @param g java.awt.Graphics
+         * Paints the image with current zoom level.
          */
+        @Override
         protected void paintComponent(Graphics g)
         {
             Graphics2D g2 = (Graphics2D) g;
             if (myImage != null)
             {
+                double scaleW = (double)getWidth()  / myImage.getWidth(this);
+                double scaleH = (double)getHeight() / myImage.getHeight(this);
+                double scale = Math.min(scaleW, scaleH) + mscale * 0.05d;
+
                 g2.scale(scale, scale);
-                g2.drawImage(myImage, 1, 1, imgWidth, imgHeight, this);
-            }
+                g2.drawImage(myImage, mx + 1, my + 1, this);
         }
-
-        public void setScale(int scale)
-        {
-            this.scale = scale;
-
-            setSize(imgWidth * scale, imgHeight * scale);
-            prefSize = getSize();
-
-            revalidate();
-            repaint();
-        }
-
-        public int getScale()
-        {
-            return scale;
         }
     }
 
     public TestImage(byte data[], int w, int h, int scanlineStride)
     {
-        super("Demobild");
+        super("Demo image");
 
         // Color-Model sagt: bit = 0 -> schwarz, bit = 1 -> weiss. Ggf. umdrehen.
         ColorModel colorModel = new IndexColorModel(1, 2, new byte[] { (byte) 0xff, 0x00 },
@@ -217,6 +177,7 @@ public class TestImage extends JFrame
         // imageComponent.setScale(4);
 
         JScrollPane sp = new JScrollPane(imageComponent);
+        sp.setOpaque(true);
 
         setContentPane(sp);
 
@@ -239,17 +200,17 @@ public class TestImage extends JFrame
     {
         super("Demobild");
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         ImageComponent imageComponent = new ImageComponent(bufferedImage);
-        imageComponent.setScale(1);
 
         JScrollPane sp = new JScrollPane(imageComponent);
+        sp.setOpaque(true);
 
         setContentPane(sp);
 
         pack();
-        setSize(new Dimension(1600, 900));
+        setSize(1024, 768);
         setVisible(true);
 
         try
@@ -258,7 +219,6 @@ public class TestImage extends JFrame
         }
         catch (IOException e)
         {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
