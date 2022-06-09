@@ -38,7 +38,7 @@ public class GenericRefinementRegion implements Region
     {
         protected abstract short form(short c1, short c2, short c3, short c4, short c5);
 
-        protected abstract void setIndex(CX cx);
+        protected abstract int getIndex();
     }
 
     private static class Template0 extends Template
@@ -51,10 +51,10 @@ public class GenericRefinementRegion implements Region
         }
 
         @Override
-        protected void setIndex(CX cx)
+        protected int getIndex()
         {
             // Figure 14, page 22
-            cx.setIndex(0x100);
+            return 0x100;
         }
 
     }
@@ -69,10 +69,10 @@ public class GenericRefinementRegion implements Region
         }
 
         @Override
-        protected void setIndex(CX cx)
+        protected int getIndex()
         {
             // Figure 15, page 22
-            cx.setIndex(0x080);
+            return 0x080;
         }
 
     }
@@ -257,8 +257,7 @@ public class GenericRefinementRegion implements Region
 
     private int decodeSLTP() throws IOException
     {
-        template.setIndex(cx);
-        return arithDecoder.decode(cx);
+        return arithDecoder.decode(cx, template.getIndex());
     }
 
     private Bitmap getGrReference()
@@ -399,16 +398,17 @@ public class GenericRefinementRegion implements Region
 
             final short tval = templateFormation.form(c1, c2, c3, c4, c5);
 
+            int index;
             if (override)
             {
-                cx.setIndex(overrideAtTemplate0(tval, x, lineNumber,
-                        regionBitmap.getByte(regionBitmap.getByteIndex(x, lineNumber)), minorX));
+                index = overrideAtTemplate0(tval, x, lineNumber,
+                        regionBitmap.getByte(regionBitmap.getByteIndex(x, lineNumber)), minorX);
             }
             else
             {
-                cx.setIndex(tval);
+                index = tval;
             }
-            final int bit = arithDecoder.decode(cx);
+            final int bit = arithDecoder.decode(cx, index);
             regionBitmap.setPixel(x, lineNumber, (byte) bit);
 
             c1 = (short) (((c1 << 1) | 0x01 & (w1 >>> 7)) & 0x07);
@@ -546,7 +546,6 @@ public class GenericRefinementRegion implements Region
             throws IOException
     {
         int context;
-        int overriddenContext;
 
         int previousLine;
         int previousReferenceLine;
@@ -655,17 +654,16 @@ public class GenericRefinementRegion implements Region
                 {
                     // iii) - is like 3 c) but for one pixel only
 
+                    int index;
                     if (override)
                     {
-                        overriddenContext = overrideAtTemplate0(context, x + minorX, lineNumber,
-                                result, minorX);
-                        cx.setIndex(overriddenContext);
+                        index = overrideAtTemplate0(context, x + minorX, lineNumber, result, minorX);
                     }
                     else
                     {
-                        cx.setIndex(context);
+                        index = context;
                     }
-                    bit = arithDecoder.decode(cx);
+                    bit = arithDecoder.decode(cx, index);
                 }
 
                 final int toShift = 7 - minorX;
@@ -792,8 +790,7 @@ public class GenericRefinementRegion implements Region
                 }
                 else
                 {
-                    cx.setIndex(context);
-                    bit = arithDecoder.decode(cx);
+                    bit = arithDecoder.decode(cx, context);
                 }
 
                 final int toShift = 7 - minorX;
