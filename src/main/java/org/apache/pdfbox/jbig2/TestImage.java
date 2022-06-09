@@ -20,10 +20,9 @@ package org.apache.pdfbox.jbig2;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
-import java.awt.MediaTracker;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -43,6 +42,7 @@ import java.io.IOException;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 /**
@@ -52,163 +52,26 @@ public class TestImage extends JFrame
 {
     private static final long serialVersionUID = 7353175320371957550L;
 
-    static class ImageComponent extends JComponent implements MouseWheelListener, MouseListener, MouseMotionListener
+    
+    public TestImage(byte data[], int w, int h, int scanlineStride)
     {
-        private static final long serialVersionUID = -5921296548288376287L;
-        Image myImage;
-        int x, y, mscale = 0, mx, my;
-        
-        {
-            addMouseListener(this);
-            addMouseMotionListener(this);
-            addMouseWheelListener(this);
-        }
-
-        
-        @Override public void mouseClicked(MouseEvent e) {}
-        @Override public void mouseEntered(MouseEvent e) {}
-        @Override public void mouseExited(MouseEvent e) {}
-        @Override public void mouseMoved(MouseEvent e) {}
-        @Override public void mouseReleased(MouseEvent e) {}
-        @Override public void mousePressed(MouseEvent e) {
-            x = e.getX();
-            y = e.getY();
-        }
-        @Override public void mouseDragged(MouseEvent e) {
-            mx = Math.min(0, mx + e.getX() - x);
-            my = Math.min(0, my + e.getY() - y);
-            x = e.getX();
-            y = e.getY();
-            repaint();
-        }
-        @Override public void mouseWheelMoved(MouseWheelEvent e) {
-            mscale -= e.getWheelRotation();
-            repaint();
-        }
-        
-
-        protected ImageComponent()
-        {
-            super();
-        }
-
-        public ImageComponent(Image image)
-        {
-            super();
-            setImage(image);
-        }
-
-        /**
-         * Sets an image to be shown
-         */
-        public void setImage(Image image)
-        {
-            if (myImage != null)
-            {
-                myImage.flush();
-            }
-
-            myImage = image;
-
-            if (myImage != null)
-            {
-                MediaTracker mt = new MediaTracker(this);
-
-                mt.addImage(myImage, 0);
-
-                try
-                {
-                    mt.waitForAll();
-                }
-                catch (Exception ex)
-                {
-                }
-                invalidate();
-                validate();
-                repaint();
-            }
-        }
-
-        /**
-         * Returns 1px wide border insets.
-         */
-        @Override
-        public Insets getInsets()
-        {
-            return new Insets(1, 1, 1, 1);
-        }
-
-        /**
-         * Paints the image with current zoom level.
-         */
-        @Override
-        protected void paintComponent(Graphics g)
-        {
-            Graphics2D g2 = (Graphics2D) g;
-            if (myImage != null)
-            {
-                double scaleW = (double)getWidth()  / myImage.getWidth(this);
-                double scaleH = (double)getHeight() / myImage.getHeight(this);
-                double scale = Math.min(scaleW, scaleH) + mscale * 0.05d;
-
-                g2.scale(scale, scale);
-                g2.drawImage(myImage, mx + 1, my + 1, this);
-        }
-        }
+        this(makeImage(data, w, h, scanlineStride));
     }
 
-    public TestImage(byte data[], int w, int h, int scanlineStride)
+    
+    public TestImage(BufferedImage image)
     {
         super("Demo image");
 
-        // Color-Model sagt: bit = 0 -> schwarz, bit = 1 -> weiss. Ggf. umdrehen.
-        ColorModel colorModel = new IndexColorModel(1, 2, new byte[] { (byte) 0xff, 0x00 },
-                new byte[] { (byte) 0xff, 0x00 }, new byte[] { (byte) 0xff, 0x00 });
-
-        DataBuffer dataBuffer = new DataBufferByte(data, data.length);
-        SampleModel sampleModel = new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE, w, h, 1,
-                scanlineStride, 0);
-        WritableRaster writableRaster = Raster.createWritableRaster(sampleModel, dataBuffer,
-                new Point(0, 0));
-
-        BufferedImage image = new BufferedImage(colorModel, writableRaster, false, null);
-
-        ImageComponent imageComponent = new ImageComponent(image);
-        // imageComponent.setScale(4);
-
-        JScrollPane sp = new JScrollPane(imageComponent);
-        sp.setOpaque(true);
-
-        setContentPane(sp);
-
-        pack();
-        setSize(new Dimension(1600, 900));
-        setVisible(true);
-
-        try
-        {
-            System.in.read();
-        }
-        catch (IOException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    public TestImage(BufferedImage bufferedImage)
-    {
-        super("Demobild");
-
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        ImageComponent imageComponent = new ImageComponent(bufferedImage);
-
-        JScrollPane sp = new JScrollPane(imageComponent);
+        final ImageComponent imageComponent = new ImageComponent(image);
+        final JScrollPane sp = new JScrollPane(imageComponent);
         sp.setOpaque(true);
-
+        sp.setAutoscrolls(true);
+        sp.setWheelScrollingEnabled(false);
         setContentPane(sp);
-
+        
         pack();
         setSize(1024, 768);
         setVisible(true);
@@ -221,5 +84,98 @@ public class TestImage extends JFrame
         {
             e.printStackTrace();
         }
+    }
+    
+    
+    class ImageComponent extends JComponent implements MouseWheelListener, MouseListener, MouseMotionListener
+    {
+        private static final long serialVersionUID = -5921296548288376287L;
+        
+        private final BufferedImage image;
+        private Point start, origin;
+        private int mscale = 0;
+        
+        public ImageComponent(BufferedImage image)
+        {
+            this.image = image;
+            setAutoscrolls(true);
+            addMouseListener(this);
+            addMouseMotionListener(this);
+            addMouseWheelListener(this);
+        }
+        
+        private float getScale()
+        {
+            return 1 + mscale * 0.05f;            
+        }
+        
+        @Override
+        public Insets getInsets()
+        {
+            return new Insets(1, 1, 1, 1);
+        }
+
+        
+        @Override
+        public Dimension getPreferredSize()
+        {
+            float scale = getScale();
+            return new Dimension(Math.round(image.getWidth() * scale), Math.round(image.getHeight() * scale));
+        }
+        
+        @Override
+        protected void paintComponent(Graphics g)
+        {
+            Graphics2D g2 = (Graphics2D) g;
+            Dimension d = getPreferredSize();
+            Object old = g2.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            g2.drawImage(image, 0, 0, d.width, d.height, this);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, old==null ? RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR : old);
+        }
+        
+        @Override
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            mscale -= e.getWheelRotation();
+            getParent().revalidate();
+        }
+                
+        @Override
+        public void mousePressed(MouseEvent e) {
+            JScrollPane sp = (JScrollPane)SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+            start  = new Point(sp.getHorizontalScrollBar().getValue(), sp.getVerticalScrollBar().getValue());
+            origin = e.getLocationOnScreen();
+        }
+        
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            JScrollPane sp = (JScrollPane)SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+            int x = Math.max(0, Math.min(sp.getHorizontalScrollBar().getMaximum(), start.x + origin.x - e.getXOnScreen()));
+            int y = Math.max(0, Math.min(sp.getVerticalScrollBar()  .getMaximum(), start.y + origin.y - e.getYOnScreen()));
+            sp.getHorizontalScrollBar().setValue(x);
+            sp.getVerticalScrollBar()  .setValue(y);
+        }
+        @Override public void mouseClicked(MouseEvent e) {}
+        @Override public void mouseEntered(MouseEvent e) {}
+        @Override public void mouseExited(MouseEvent e) {}
+        @Override public void mouseMoved(MouseEvent e) {}
+        @Override public void mouseReleased(MouseEvent e) {}
+    }
+
+    
+    
+    private static BufferedImage makeImage(byte data[], int w, int h, int scanlineStride)
+    {
+        // Color-Model sagt: bit = 0 -> schwarz, bit = 1 -> weiss. Ggf. umdrehen.
+        ColorModel colorModel = new IndexColorModel(1, 2, new byte[] { (byte) 0xff, 0x00 },
+                new byte[] { (byte) 0xff, 0x00 }, new byte[] { (byte) 0xff, 0x00 });
+
+        DataBuffer dataBuffer = new DataBufferByte(data, data.length);
+        SampleModel sampleModel = new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE, w, h, 1,
+                scanlineStride, 0);
+        WritableRaster writableRaster = Raster.createWritableRaster(sampleModel, dataBuffer,
+                new Point(0, 0));
+
+        return new BufferedImage(colorModel, writableRaster, false, null);
     }
 }
