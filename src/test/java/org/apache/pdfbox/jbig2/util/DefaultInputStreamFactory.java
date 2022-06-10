@@ -27,7 +27,7 @@ import javax.imageio.stream.MemoryCacheImageInputStream;
 public class DefaultInputStreamFactory
 {
 
-    public static ImageInputStream getInputStream(InputStream is)
+    public ImageInputStream getInputStream(InputStream is)
     {
         try
         {
