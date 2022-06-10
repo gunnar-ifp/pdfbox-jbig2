@@ -177,6 +177,7 @@ public class Bitmaps
         
         if (scaleX != 1 || scaleY != 1)
         {
+            // scaling required
             final Rectangle bounds = new Rectangle(0, 0, //
                     (int) Math.round(width * scaleX), //
                     (int) Math.round(height * scaleY));
@@ -195,16 +196,16 @@ public class Bitmaps
             // extra care is taken to ensure padding bits are set to zero
             final int bytes = width / 8;
             final int bits = (~0xff >> (width & 7)) & 0xff;
+            final byte[] src = bitmap.bitmap;
             final byte[] dst = new byte[height * bitmap.getRowStride()];
-            for ( int idx = 0, row = height; row>0; row-- ) 
-            {
-                for ( int count = bytes; count>0; count-- ) 
-                {
-                    dst[idx] = (byte)~bitmap.getByte(idx++);
+            if ( bits==0 ) {
+                for ( int idx = 0, row = height; row>0; row-- ) {
+                    for ( int count = bytes; count>0; count-- ) dst[idx] = (byte)~src[idx++];
                 }
-                if ( bits!=0 )
-                {
-                    dst[idx] = (byte)(~bitmap.getByte(idx++) & bits);
+            } else {
+                for ( int idx = 0, row = height; row>0; row-- ) {
+                    for ( int count = bytes; count>0; count-- ) dst[idx] = (byte)~src[idx++];
+                    dst[idx] = (byte)(~src[idx++] & bits);
                 }
             }
             raster = Raster.createPackedRaster(new DataBufferByte(dst, dst.length), width, height, 1, new Point());
@@ -518,6 +519,42 @@ public class Bitmaps
         }
     }
 
+    
+    /**
+     * The method combines two given bytes arrays with an logical operator.
+     * <p>
+     * The JBIG2 Standard specifies 5 possible combinations of bytes.<br>
+     * <p>
+     * <b>Hint:</b> Please take a look at ISO/IEC 14492:2001 (E) for detailed definition and description of the
+     * operators.
+     * 
+     * @param op - The specified combination operator.
+     */
+    public static void combineBytes(byte[] src, int srcPos, byte[] dst, int dstPos, int length, CombinationOperator op)
+    {
+        switch (op) {
+            case OR:
+                while ( length-->0 ) dst[dstPos++] |= src[srcPos++];
+                break;
+                
+            case AND:
+                while ( length-->0 ) dst[dstPos++] &= src[srcPos++];
+                break;
+                
+            case XOR:
+                while ( length-->0 ) dst[dstPos++] ^= src[srcPos++];
+                break;
+                
+            case XNOR:
+                while ( length-->0 ) dst[dstPos] = (byte)~(dst[dstPos++] ^ src[srcPos++]);
+                break;
+                
+            case REPLACE:
+            default:
+                System.arraycopy(src, srcPos, dst, dstPos, length);
+        }
+    }
+
     /**
      * This method combines a given bitmap with the current instance.
      * <p>
@@ -593,34 +630,11 @@ public class Bitmaps
     private static void blitUnshifted(Bitmap src, Bitmap dst, int startLine, int lastLine,
             int dstStartIdx, int srcStartIdx, int srcEndIdx, CombinationOperator op)
     {
-        final int length = srcEndIdx - srcStartIdx + 1; // srcEndIdx is inclusive 
-        int srcStartOffset = srcStartIdx;
-        int dstStartOffset = dstStartIdx;
-        for ( int lines = lastLine - startLine; lines > 0; lines-- ) 
-        {
-            int srcIdx = srcStartOffset;
-            int dstIdx = dstStartOffset;
-            int count = length;
-            // Go through the bytes in a line of the Symbol
-            switch (op) 
-            {
-                case OR:   
-                case AND:  
-                case XOR:  
-                case XNOR: 
-                    while ( count-- > 0 ) 
-                    {
-                        dst.setByte(dstIdx, combineBytes(src.getByte(srcIdx++), dst.getByte(dstIdx++), op));
-                    }
-                    break;
-                case REPLACE:
-                    Bitmap.arraycopy(src, srcIdx, dst, dstIdx, count);
-                    break;
-                default:
-                    break;
-            }
-            srcStartOffset += src.getRowStride();
-            dstStartOffset += dst.getRowStride();
+        final int length = srcEndIdx - srcStartIdx + 1; // srcEndIdx is inclusive
+        for ( int count = lastLine - startLine; count>0; count-- ) {
+            combineBytes(src.bitmap, srcStartIdx, dst.bitmap, dstStartIdx, length, op);
+            srcStartIdx += src.getRowStride();
+            dstStartIdx += dst.getRowStride();
         }
     }
 
