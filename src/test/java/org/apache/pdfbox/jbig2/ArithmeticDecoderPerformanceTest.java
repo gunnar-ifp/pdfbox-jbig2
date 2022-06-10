@@ -30,20 +30,19 @@ import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
 /**
  * Arithmetic Decoder performance tests.
  * <p>
- * Run with {@code -XX:-TieredCompilation} or {@code -XX:TieredStopAtLevel=1}.
+ * Run with {@code -XX:-TieredCompilation}, {@code -XX:TieredStopAtLevel=1}, or {@code -Djava.compiler=NONE}.
  * 
  * <p>
  * For in depth optimization debugging use JITWatch with<br>
  * {@code -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly -XX:+DebugNonSafepoints}<br>
  * {@code -XX:+UnlockDiagnosticVMOptions -Xlog:class+load=info -XX:+LogCompilation -XX:+PrintAssembly -XX:+DebugNonSafepoints}<br>
- * Optional: {@code  }
  */
 public class ArithmeticDecoderPerformanceTest
 {
     public static void main(String[] args)
         throws InterruptedException, InvocationTargetException, IOException, JBIG2Exception
     {
-        int loops = 10000;
+        int limit = 20;
         //System.in.read();  // pause for jvisualvm if necessary 
 
         final ImageInputStream iis;
@@ -56,22 +55,29 @@ public class ArithmeticDecoderPerformanceTest
             in.close();
         }
         
-//      JBIG2ImageReader imageReader = new JBIG2ImageReader(new JBIG2ImageReaderSpi());
-//      imageReader.setInput(imageInputStream);
-
         final JBIG2Document doc = new JBIG2Document(iis);
         final JBIG2Page page = doc.getPage(1);
-        for ( int i = 0; i<500; i++ ) {
+        
+        if ( !System.getProperty("java.vm.info", "").contains("interpret") ) {
+            System.out.println("warming up for " + (limit / 10) + " seconds");
+            for ( long end = System.currentTimeMillis() + limit * 1000 / 10; System.currentTimeMillis() < end; ) {
+                for ( int i = 0; i<10; i++ ) {
+                    page.getBitmap();
+                    page.clearPageData();
+                }
+            }
+            Thread.sleep(1000);
+        }
+        
+        System.out.println("running for " + limit + " seconds");
+        final long now = System.currentTimeMillis();
+        
+        int loops = 0;
+        for ( long end = now + limit * 1000; System.currentTimeMillis() < end; loops++ ) {
             page.getBitmap();
             page.clearPageData();
         }
-        Thread.sleep(2000);
-        final long timeStamp = System.currentTimeMillis();
-        for ( int i = 0; i<loops; i++ ) {
-            page.getBitmap();
-            page.clearPageData();
-        }
-        long time = System.currentTimeMillis() - timeStamp;
+        long time = System.currentTimeMillis() - now;
         System.out.println("used " + time + " ms for " + loops + " iterations: " + ((double)time / loops) + " ms/loop");
     }
 
