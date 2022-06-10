@@ -31,7 +31,6 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
-import org.apache.pdfbox.jbig2.image.FilterType;
 import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
 
 public class JBIG2ImageReaderDemo
@@ -61,8 +60,7 @@ public class JBIG2ImageReaderDemo
 
         final JBIG2Document doc = new JBIG2Document(imageInputStream);
         final Bitmap bitmap = doc.getPage(imageIndex).getBitmap();
-        final BufferedImage bufferedImage = Bitmaps.asBufferedImage(bitmap, param,
-                FilterType.Lanczos);
+        final BufferedImage bufferedImage = Bitmaps.asBufferedImage(bitmap);
         long duration = System.currentTimeMillis() - timeStamp;
         System.out.println(filepath + " decoding took " + duration + " ms");
 
@@ -72,7 +70,7 @@ public class JBIG2ImageReaderDemo
     public static void main(String[] args)
             throws InterruptedException, InvocationTargetException, IOException, JBIG2Exception
     {
-        URL imageUrl = JBIG2ImageReaderDemo.class.getResource("/images/042_1.jb2");
+        URL imageUrl = JBIG2ImageReaderDemo.class.getResource("/images/002.jb2");
         new JBIG2ImageReaderDemo(imageUrl.getPath(), 1).show();
     }
 
