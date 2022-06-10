@@ -27,17 +27,11 @@ public class StandardTables
         private StandardTable(int table[][])
         {
 
-            List<Code> codeTable = new ArrayList<Code>();
+            List<Code> codeTable = new ArrayList<Code>(table.length);
 
             for (int i = 0; i < table.length; i++)
             {
-                int prefixLength = table[i][0];
-                int rangeLength = table[i][1];
-                int rangeLow = table[i][2];
-                boolean isLowerRange = false;
-                if (table[i].length > 3)
-                    isLowerRange = true;
-                codeTable.add(new Code(prefixLength, rangeLength, rangeLow, isLowerRange));
+                codeTable.add(new Code(table[i][0], table[i][1], table[i][2], table[i].length > 3));
             }
 
             initTree(codeTable);

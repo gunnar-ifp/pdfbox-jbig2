@@ -45,11 +45,12 @@ final class BitmapScanline extends Scanline
     protected void fetch(int x, final int y)
     {
         lineBuffer = new int[length]; // really required?
+        final int w = bitmap.getWidth();
         int srcByteIdx = bitmap.getByteIndex(x, y);
         while (x < length)
         {
             final byte srcByte = (byte) ~bitmap.getByte(srcByteIdx++);
-            final int bits = bitmap.getWidth() - x > 8 ? 8 : bitmap.getWidth() - x;
+            final int bits = w - x > 8 ? 8 : w - x;
             for (int bitPosition = bits - 1; bitPosition >= 0; bitPosition--, x++)
             {
                 if (((srcByte >> bitPosition) & 0x1) != 0)

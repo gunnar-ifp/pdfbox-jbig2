@@ -31,8 +31,8 @@ import org.apache.pdfbox.jbig2.image.Bitmap;
 public class MMRDecompressor
 {
 
-    private int width;
-    private int height;
+    private final int width;
+    private final int height;
 
     /**
      * A class encapsulating the compressed raw data.
