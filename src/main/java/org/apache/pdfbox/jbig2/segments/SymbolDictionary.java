@@ -472,39 +472,39 @@ public class SymbolDictionary implements Dictionary
     {
         if (cxIADT == null)
         {
-            cxIADT = new CX(512, 1);
+            cxIADT = new CX(512);
         }
 
         if (cxIADH == null)
         {
-            cxIADH = new CX(512, 1);
+            cxIADH = new CX(512);
         }
 
         if (cxIADW == null)
         {
-            cxIADW = new CX(512, 1);
+            cxIADW = new CX(512);
         }
 
         if (cxIAAI == null)
         {
-            cxIAAI = new CX(512, 1);
+            cxIAAI = new CX(512);
         }
 
         if (cxIAEX == null)
         {
-            cxIAEX = new CX(512, 1);
+            cxIAEX = new CX(512);
         }
 
         if (useRefinementAggregation && cxIAID == null)
         {
-            cxIAID = new CX(1 << sbSymCodeLen, 1);
-            cxIARDX = new CX(512, 1);
-            cxIARDY = new CX(512, 1);
+            cxIAID = new CX(1 << sbSymCodeLen);
+            cxIARDX = new CX(512);
+            cxIARDY = new CX(512);
         }
 
         if (cx == null)
         {
-            cx = new CX(65536, 1);
+            cx = new CX(65536);
         }
 
         if (arithmeticDecoder == null)
@@ -611,15 +611,15 @@ public class SymbolDictionary implements Dictionary
             textRegion = new TextRegion(subInputStream, null);
 
             textRegion.setContexts(cx, // default context
-                    new CX(512, 1), // IADT
-                    new CX(512, 1), // IAFS
-                    new CX(512, 1), // IADS
-                    new CX(512, 1), // IAIT
+                    new CX(512), // IADT
+                    new CX(512), // IAFS
+                    new CX(512), // IADS
+                    new CX(512), // IAIT
                     cxIAID, // IAID
-                    new CX(512, 1), // IARDW
-                    new CX(512, 1), // IARDH
-                    new CX(512, 1), // IARDX
-                    new CX(512, 1) // IARDY
+                    new CX(512), // IARDW
+                    new CX(512), // IARDH
+                    new CX(512), // IARDX
+                    new CX(512) // IARDY
             );
         }
 
@@ -694,7 +694,7 @@ public class SymbolDictionary implements Dictionary
 
             if (cx == null)
             {
-                cx = new CX(65536, 1);
+                cx = new CX(65536);
             }
         }
 

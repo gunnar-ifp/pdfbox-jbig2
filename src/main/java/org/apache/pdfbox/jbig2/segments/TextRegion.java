@@ -339,34 +339,34 @@ public class TextRegion implements Region
     private void setCodingStatistics() throws IOException
     {
         if (cxIADT == null)
-            cxIADT = new CX(512, 1);
+            cxIADT = new CX(512);
 
         if (cxIAFS == null)
-            cxIAFS = new CX(512, 1);
+            cxIAFS = new CX(512);
 
         if (cxIADS == null)
-            cxIADS = new CX(512, 1);
+            cxIADS = new CX(512);
 
         if (cxIAIT == null)
-            cxIAIT = new CX(512, 1);
+            cxIAIT = new CX(512);
 
         if (cxIARI == null)
-            cxIARI = new CX(512, 1);
+            cxIARI = new CX(512);
 
         if (cxIARDW == null)
-            cxIARDW = new CX(512, 1);
+            cxIARDW = new CX(512);
 
         if (cxIARDH == null)
-            cxIARDH = new CX(512, 1);
+            cxIARDH = new CX(512);
 
         if (cxIAID == null)
-            cxIAID = new CX(1 << symbolCodeLength, 1);
+            cxIAID = new CX(1 << symbolCodeLength);
 
         if (cxIARDX == null)
-            cxIARDX = new CX(512, 1);
+            cxIARDX = new CX(512);
 
         if (cxIARDY == null)
-            cxIARDY = new CX(512, 1);
+            cxIARDY = new CX(512);
 
         if (arithmeticDecoder == null)
             arithmeticDecoder = new ArithmeticDecoder(subInputStream);

@@ -35,6 +35,8 @@ import org.apache.pdfbox.jbig2.io.SubInputStream;
  */
 public class GenericRegion implements Region
 {
+    private final static int[] gbTemplateIndexes = { 0x9b25, 0x795, 0xe5, 0x195 };
+
     private SubInputStream subInputStream;
     private long dataHeaderOffset;
     private long dataHeaderLength;
@@ -196,7 +198,7 @@ public class GenericRegion implements Region
                 }
                 if (cx == null)
                 {
-                    cx = new CX(65536, 1);
+                    cx = new CX(65536);
                 }
 
                 /* 6.2.5.7 - 2) */
@@ -255,22 +257,7 @@ public class GenericRegion implements Region
 
     private int decodeSLTP() throws IOException
     {
-        switch (gbTemplate)
-        {
-        case 0:
-            cx.setIndex(0x9b25);
-            break;
-        case 1:
-            cx.setIndex(0x795);
-            break;
-        case 2:
-            cx.setIndex(0xe5);
-            break;
-        case 3:
-            cx.setIndex(0x195);
-            break;
-        }
-        return arithDecoder.decode(cx);
+        return arithDecoder.decode(cx, gbTemplateIndexes[gbTemplate]);
     }
 
     private void decodeLine(final int lineNumber, final int width, final int rowStride,
@@ -325,7 +312,6 @@ public class GenericRegion implements Region
             final int paddedWidth, int byteIndex, int idx) throws IOException
     {
         int context;
-        int overriddenContext = 0;
 
         int line1 = 0;
         int line2 = 0;
@@ -365,18 +351,18 @@ public class GenericRegion implements Region
             for (int minorX = 0; minorX < minorWidth; minorX++)
             {
                 final int toShift = 7 - minorX;
+                int index;
                 if (override)
                 {
-                    overriddenContext = overrideAtTemplate0a(context, (x + minorX), lineNumber,
+                    index = overrideAtTemplate0a(context, (x + minorX), lineNumber,
                             result, minorX, toShift);
-                    cx.setIndex(overriddenContext);
                 }
                 else
                 {
-                    cx.setIndex(context);
+                    index = context;
                 }
 
-                int bit = arithDecoder.decode(cx);
+                final int bit = arithDecoder.decode(cx, index);
 
                 result |= bit << toShift;
 
@@ -393,7 +379,6 @@ public class GenericRegion implements Region
             final int paddedWidth, int byteIndex, int idx) throws IOException
     {
         int context;
-        int overriddenContext = 0;
 
         int line1 = 0;
         int line2 = 0;
@@ -433,18 +418,18 @@ public class GenericRegion implements Region
             for (int minorX = 0; minorX < minorWidth; minorX++)
             {
                 final int toShift = 7 - minorX;
+                int index;
                 if (override)
                 {
-                    overriddenContext = overrideAtTemplate0b(context, (x + minorX), lineNumber,
+                    index = overrideAtTemplate0b(context, (x + minorX), lineNumber,
                             result, minorX, toShift);
-                    cx.setIndex(overriddenContext);
                 }
                 else
                 {
-                    cx.setIndex(context);
+                    index = context;
                 }
 
-                final int bit = arithDecoder.decode(cx);
+                final int bit = arithDecoder.decode(cx, index);
 
                 result |= bit << toShift;
 
@@ -461,7 +446,6 @@ public class GenericRegion implements Region
             final int paddedWidth, int byteIndex, int idx) throws IOException
     {
         int context;
-        int overriddenContext;
 
         int line1 = 0;
         int line2 = 0;
@@ -500,18 +484,17 @@ public class GenericRegion implements Region
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
             {
+                int index;
                 if (override)
                 {
-                    overriddenContext = overrideAtTemplate1(context, x + minorX, lineNumber, result,
-                            minorX);
-                    cx.setIndex(overriddenContext);
+                    index = overrideAtTemplate1(context, x + minorX, lineNumber, result, minorX);
                 }
                 else
                 {
-                    cx.setIndex(context);
+                    index = context;
                 }
 
-                final int bit = arithDecoder.decode(cx);
+                final int bit = arithDecoder.decode(cx, index);
 
                 result |= bit << 7 - minorX;
 
@@ -529,7 +512,6 @@ public class GenericRegion implements Region
             final int paddedWidth, int byteIndex, int idx) throws IOException
     {
         int context;
-        int overriddenContext;
 
         int line1 = 0;
         int line2 = 0;
@@ -568,19 +550,17 @@ public class GenericRegion implements Region
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
             {
-
+                int index; 
                 if (override)
                 {
-                    overriddenContext = overrideAtTemplate2(context, x + minorX, lineNumber, result,
-                            minorX);
-                    cx.setIndex(overriddenContext);
+                    index = overrideAtTemplate2(context, x + minorX, lineNumber, result, minorX);
                 }
                 else
                 {
-                    cx.setIndex(context);
+                    index = context;
                 }
 
-                final int bit = arithDecoder.decode(cx);
+                final int bit = arithDecoder.decode(cx, index);
 
                 result |= bit << (7 - minorX);
 
@@ -598,7 +578,6 @@ public class GenericRegion implements Region
             final int paddedWidth, int byteIndex, int idx) throws IOException
     {
         int context;
-        int overriddenContext;
 
         int line1 = 0;
 
@@ -625,19 +604,17 @@ public class GenericRegion implements Region
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
             {
-
+                int index;
                 if (override)
                 {
-                    overriddenContext = overrideAtTemplate3(context, x + minorX, lineNumber, result,
-                            minorX);
-                    cx.setIndex(overriddenContext);
+                    index = overrideAtTemplate3(context, x + minorX, lineNumber, result, minorX);
                 }
                 else
                 {
-                    cx.setIndex(context);
+                    index = context;
                 }
 
-                final int bit = arithDecoder.decode(cx);
+                final int bit = arithDecoder.decode(cx, index);
 
                 result |= bit << (7 - minorX);
                 context = ((context & 0x1f7) << 1) | bit | ((line1 >> (8 - minorX)) & 0x010);
