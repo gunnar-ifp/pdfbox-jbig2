@@ -17,7 +17,7 @@
 
 package org.apache.pdfbox.jbig2.image;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
 import java.awt.Rectangle;
@@ -31,7 +31,6 @@ import javax.imageio.stream.ImageInputStream;
 import org.apache.pdfbox.jbig2.Bitmap;
 import org.apache.pdfbox.jbig2.JBIG2DocumentFacade;
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
-import org.apache.pdfbox.jbig2.image.Bitmaps;
 import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
 import org.junit.Test;
@@ -58,10 +57,7 @@ public class BitmapsBlitTest
         final Bitmap dst = new Bitmap(src.getWidth(), src.getHeight());
         Bitmaps.blit(src, dst, 0, 0, CombinationOperator.REPLACE);
 
-        final byte[] srcData = src.getByteArray();
-        final byte[] dstData = dst.getByteArray();
-
-        assertArrayEquals(srcData, dstData);
+        assertTrue(src.equals(dst));
     }
 
     @Test
@@ -87,10 +83,7 @@ public class BitmapsBlitTest
 
         final Bitmap dstRegionBitmap = Bitmaps.extract(roi, dst);
 
-        final byte[] srcData = src.getByteArray();
-        final byte[] dstRegionData = dstRegionBitmap.getByteArray();
-
-        assertArrayEquals(srcData, dstRegionData);
+        assertTrue(src.equals(dstRegionBitmap));
     }
 
 }

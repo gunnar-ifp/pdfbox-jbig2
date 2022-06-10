@@ -19,7 +19,6 @@ package org.apache.pdfbox.jbig2.segments;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.apache.pdfbox.jbig2.Bitmap;
 import org.apache.pdfbox.jbig2.Region;
@@ -165,7 +164,7 @@ public class HalftoneRegion implements Region
 
             if (hDefaultPixel == 1)
             {
-                Arrays.fill(halftoneRegionBitmap.getByteArray(), (byte) 0xff);
+                halftoneRegionBitmap.fillBitmap((byte) 0xff);
             }
 
             /* 2) */

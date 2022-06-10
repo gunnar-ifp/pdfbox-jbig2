@@ -19,7 +19,6 @@ package org.apache.pdfbox.jbig2.segments;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.pdfbox.jbig2.Bitmap;
@@ -38,17 +37,12 @@ import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
 import org.apache.pdfbox.jbig2.io.SubInputStream;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
-import org.apache.pdfbox.jbig2.util.log.Logger;
-import org.apache.pdfbox.jbig2.util.log.LoggerFactory;
 
 /**
  * This class represented the segment type "Text region", 7.4.3, page 56.
  */
 public class TextRegion implements Region
 {
-
-    private final Logger log = LoggerFactory.getLogger(TextRegion.class);
-
     private SubInputStream subInputStream;
 
     /** Region segment information field, 7.4.1 */
@@ -258,8 +252,6 @@ public class TextRegion implements Region
         long pixels = (long) regionInfo.getBitmapWidth() * (long) regionInfo.getBitmapHeight();
         if (pixels < amountOfSymbolInstances)
         {
-            log.warn("Limiting number of decoded symbol instances to one per pixel (" + pixels
-                    + " instead of " + amountOfSymbolInstances + ")");
             amountOfSymbolInstances = pixels;
         }
     }
@@ -394,7 +386,7 @@ public class TextRegion implements Region
         /* 1) */
         if (defaultPixel != 0)
         {
-            Arrays.fill(regionBitmap.getByteArray(), (byte) 0xff);
+            regionBitmap.fillBitmap((byte) 0xff);
         }
     }
 

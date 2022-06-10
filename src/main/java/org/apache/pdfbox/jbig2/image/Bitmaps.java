@@ -172,19 +172,19 @@ public class Bitmaps
     private static WritableRaster buildRaster(final Bitmap bitmap, final FilterType filterType,
             final double scaleX, final double scaleY)
     {
-        final int height = bitmap.getHeight(), width = bitmap.getWidth();
-        
+        final int height = bitmap.getHeight();
+        final int width = bitmap.getWidth();
         final WritableRaster raster;
+        
         if (scaleX != 1 || scaleY != 1)
         {
-            // scaling required
             final Rectangle bounds = new Rectangle(0, 0, //
                     (int) Math.round(width * scaleX), //
                     (int) Math.round(height * scaleY));
 
             raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
                     bounds.width, bounds.height, 1, new Point());
-            
+
             final Resizer resizer = new Resizer(scaleX, scaleY);
             final Filter filter = Filter.byType(filterType);
             resizer.resize(bitmap, bitmap.getBounds() /* sourceRegion */, raster, bounds, filter,
@@ -194,15 +194,22 @@ public class Bitmaps
         {
             // scaling not required: clone and invert bitmap into packed raster
             // extra care is taken to ensure padding bits are set to zero
-            final int bytes = width / 8, bits = (~0xff >> (width & 7)) & 0xff;
-            final byte[] src = bitmap.getByteArray(), dst = new byte[height * bitmap.getRowStride()];
-            for ( int idx = 0, row = height; row>0; row-- ) {
-                for ( int count = bytes; count>0; count-- ) dst[idx] = (byte)~src[idx++];
-                if ( bits!=0 ) dst[idx] = (byte)(~src[idx++] & bits);
+            final int bytes = width / 8;
+            final int bits = (~0xff >> (width & 7)) & 0xff;
+            final byte[] dst = new byte[height * bitmap.getRowStride()];
+            for ( int idx = 0, row = height; row>0; row-- ) 
+            {
+                for ( int count = bytes; count>0; count-- ) 
+                {
+                    dst[idx] = (byte)~bitmap.getByte(idx++);
+                }
+                if ( bits!=0 )
+                {
+                    dst[idx] = (byte)(~bitmap.getByte(idx++) & bits);
+                }
             }
             raster = Raster.createPackedRaster(new DataBufferByte(dst, dst.length), width, height, 1, new Point());
         }
-
         return raster;
     }
 
@@ -358,7 +365,7 @@ public class Bitmaps
         for (int x = firstSourceByteOfLine; x < lastSourceByteOfLine; x++)
         {
 
-            if (sourceOffset + 1 < src.getByteArray().length)
+            if (sourceOffset + 1 < src.getLength())
             {
                 final boolean isLastByte = x + 1 == lastSourceByteOfLine;
                 byte value = (byte) (src.getByte(sourceOffset++) << sourceUpShift
@@ -588,22 +595,33 @@ public class Bitmaps
             int dstStartIdx, int srcStartIdx, int srcEndIdx, CombinationOperator op)
     {
         final int length = srcEndIdx - srcStartIdx + 1; // srcEndIdx is inclusive 
-        final byte[] srcBytes = src.getByteArray(), dstBytes = dst.getByteArray();
-        for ( int lines = lastLine - startLine; lines>0; lines-- ) {
-            int srcIdx = srcStartIdx, dstIdx = dstStartIdx, count = length;
+        int srcStartOffset = srcStartIdx;
+        int dstStartOffset = dstStartIdx;
+        for ( int lines = lastLine - startLine; lines > 0; lines-- ) 
+        {
+            int srcIdx = srcStartOffset;
+            int dstIdx = dstStartOffset;
+            int count = length;
             // Go through the bytes in a line of the Symbol
-            switch (op) {
-                case OR:   while ( count-->0 ) dstBytes[dstIdx++] |= srcBytes[srcIdx++]; break;
-                case AND:  while ( count-->0 ) dstBytes[dstIdx++] &= srcBytes[srcIdx++]; break;
-                case XOR:  while ( count-->0 ) dstBytes[dstIdx++] ^= srcBytes[srcIdx++]; break;
-                case XNOR: while ( count-->0 ) dstBytes[dstIdx] = (byte)~(dstBytes[dstIdx++] ^ srcBytes[srcIdx++]); break;
+            switch (op) 
+            {
+                case OR:   
+                case AND:  
+                case XOR:  
+                case XNOR: 
+                    while ( count-- > 0 ) 
+                    {
+                        dst.setByte(dstIdx, combineBytes(src.getByte(srcIdx++), dst.getByte(dstIdx++), op));
+                    }
+                    break;
                 case REPLACE:
+                    Bitmap.arraycopy(src, srcIdx, dst, dstIdx, count);
+                    break;
                 default:
-                    if ( count>8 ) System.arraycopy(srcBytes, srcIdx, dstBytes, dstIdx, count);
-                    else while ( count-->0 ) dstBytes[dstIdx++] = srcBytes[srcIdx++];
+                    break;
             }
-            srcStartIdx += src.getRowStride();
-            dstStartIdx += dst.getRowStride();
+            srcStartOffset += src.getRowStride();
+            dstStartOffset += dst.getRowStride();
         }
     }
 
