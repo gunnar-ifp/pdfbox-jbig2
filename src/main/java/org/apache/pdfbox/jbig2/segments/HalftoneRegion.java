@@ -147,6 +147,7 @@ public class HalftoneRegion implements Region
      * @throws IOException if an underlying IO operation fails
      * @throws InvalidHeaderValueException if a segment header value is invalid
      */
+    @Override
     public Bitmap getRegionBitmap() throws IOException, InvalidHeaderValueException
     {
         if (null == halftoneRegionBitmap)
@@ -368,6 +369,7 @@ public class HalftoneRegion implements Region
         return value;
     }
 
+    @Override
     public void init(final SegmentHeader header, final SubInputStream sis)
             throws InvalidHeaderValueException, IOException
     {
@@ -382,6 +384,7 @@ public class HalftoneRegion implements Region
         return hCombinationOperator;
     }
 
+    @Override
     public RegionSegmentInformation getRegionInfo()
     {
         return regionInfo;

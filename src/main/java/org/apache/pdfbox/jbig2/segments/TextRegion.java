@@ -320,6 +320,7 @@ public class TextRegion implements Region
         }
     }
 
+    @Override
     public Bitmap getRegionBitmap()
             throws IOException, IntegerMaxValueException, InvalidHeaderValueException
     {
@@ -1101,6 +1102,7 @@ public class TextRegion implements Region
 
     }
 
+    @Override
     public void init(SegmentHeader header, SubInputStream sis)
             throws InvalidHeaderValueException, IntegerMaxValueException, IOException
     {
@@ -1175,6 +1177,7 @@ public class TextRegion implements Region
         this.symbolCodeLength = sbSymCodeLen;
     }
 
+    @Override
     public RegionSegmentInformation getRegionInfo()
     {
         return regionInfo;

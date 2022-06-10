@@ -20,6 +20,7 @@ package org.apache.pdfbox.jbig2;
 import java.io.IOException;
 
 import javax.imageio.stream.ImageInputStream;
+
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
 import org.apache.pdfbox.jbig2.image.Bitmap;
 
@@ -43,6 +44,7 @@ public class JBIG2DocumentFacade extends JBIG2Document
         super(input, globals);
     }
 
+    @Override
     public JBIG2Page getPage(int pageNumber)
     {
         return super.getPage(pageNumber);

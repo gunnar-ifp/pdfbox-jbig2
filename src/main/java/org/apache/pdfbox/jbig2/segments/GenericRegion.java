@@ -158,6 +158,7 @@ public class GenericRegion implements Region
      * 
      * @return The decoded {@link Bitmap} of this region.
      */
+    @Override
     public Bitmap getRegionBitmap() throws IOException
     {
         if (null == regionBitmap)
@@ -550,7 +551,7 @@ public class GenericRegion implements Region
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
             {
-                int index; 
+                int index;
                 if (override)
                 {
                     index = overrideAtTemplate2(context, x + minorX, lineNumber, result, minorX);
@@ -1002,6 +1003,7 @@ public class GenericRegion implements Region
         this.regionBitmap = null;
     }
 
+    @Override
     public void init(final SegmentHeader header, final SubInputStream sis)
             throws InvalidHeaderValueException, IOException
     {
@@ -1010,6 +1012,7 @@ public class GenericRegion implements Region
         parseHeader();
     }
 
+    @Override
     public RegionSegmentInformation getRegionInfo()
     {
         return regionInfo;

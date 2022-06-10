@@ -18,6 +18,7 @@
 package org.apache.pdfbox.jbig2.decoder.arithmetic;
 
 import java.io.InputStream;
+
 import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;

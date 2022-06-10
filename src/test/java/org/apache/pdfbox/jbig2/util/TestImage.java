@@ -106,7 +106,7 @@ public class TestImage extends JFrame
         
         private float getScale()
         {
-            return 1 + mscale * 0.05f;            
+            return 1 + mscale * 0.05f;
         }
         
         @Override

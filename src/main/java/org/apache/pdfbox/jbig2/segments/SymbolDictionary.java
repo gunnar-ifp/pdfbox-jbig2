@@ -344,6 +344,7 @@ public class SymbolDictionary implements Dictionary
      * 
      * @return List of decoded symbol bitmaps as an <code>ArrayList</code>
      */
+    @Override
     public ArrayList<Bitmap> getDictionary()
             throws IOException, IntegerMaxValueException, InvalidHeaderValueException
     {
@@ -992,6 +993,7 @@ public class SymbolDictionary implements Dictionary
         return null;
     }
 
+    @Override
     public void init(final SegmentHeader header, final SubInputStream sis)
             throws InvalidHeaderValueException, IntegerMaxValueException, IOException
     {

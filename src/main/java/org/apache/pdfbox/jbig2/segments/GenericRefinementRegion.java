@@ -190,6 +190,7 @@ public class GenericRefinementRegion implements Region
      * @throws InvalidHeaderValueException if a segment header value is invalid
      * @throws IntegerMaxValueException if the maximum value limit of an integer is exceeded
      */
+    @Override
     public Bitmap getRegionBitmap()
             throws IOException, IntegerMaxValueException, InvalidHeaderValueException
     {
@@ -857,6 +858,7 @@ public class GenericRefinementRegion implements Region
         return b.getPixel(x, y);
     }
 
+    @Override
     public void init(final SegmentHeader header, final SubInputStream sis) throws IOException
     {
         this.segmentHeader = header;
@@ -898,6 +900,7 @@ public class GenericRefinementRegion implements Region
         this.regionBitmap = null;
     }
 
+    @Override
     public RegionSegmentInformation getRegionInfo()
     {
         return regionInfo;

@@ -251,7 +251,7 @@ public class Bitmap
     
     /**
      * Copy parts of the underlying array of a Bitmap to another Bitmap.
-     *  
+     * 
      * @param src the source Bitmap
      * @param srcPos start position within the source Bitmap
      * @param dest the destination Bitmap

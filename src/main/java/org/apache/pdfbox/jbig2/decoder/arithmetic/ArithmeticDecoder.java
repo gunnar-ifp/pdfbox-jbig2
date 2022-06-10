@@ -29,10 +29,10 @@ public class ArithmeticDecoder
 {
     /**
      * Table E.1, optimized for bit operations (shifting and xor).
-     *  
+     * 
      * <pre>
      * bit      31: zero padding
-     * bit 30 - 16: QE (15 bit) 
+     * bit 30 - 16: QE (15 bit)
      * 
      * bit      15: zero padding
      * bit 14 -  9: NLPS (6 bit)
@@ -44,7 +44,7 @@ public class ArithmeticDecoder
      * </pre>
      */
     private static final int[] QE = {
-        //     QE    |   NLPS  + SWITCH |   NMPS  
+        //     QE    |   NLPS  + SWITCH |   NMPS
         0x5601 << 16 |  1 << 9 | 1 << 8 |  1 << 1,
         0x3401 << 16 |  6 << 9 | 0 << 8 |  2 << 1,
         0x1801 << 16 |  9 << 9 | 0 << 8 |  3 << 1,
@@ -98,7 +98,7 @@ public class ArithmeticDecoder
     private int a;
     /** Currently read byte */
     private int b;
-    /** Bit 31 - 16 = Chigh = x = fractional bits, bit 15 - 8 = b to be shifted up. */ 
+    /** Bit 31 - 16 = Chigh = x = fractional bits, bit 15 - 8 = b to be shifted up. */
     private int c;
     /** Counter of bits available in Clow. */
     private int ct;

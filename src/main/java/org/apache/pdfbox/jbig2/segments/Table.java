@@ -63,12 +63,13 @@ public class Table implements SegmentData
         htPS = (int) ((subInputStream.readBits(3) + 1) & 0xf);
 
         /* Bit 0 */
-        htOutOfBand = (int) subInputStream.readBit();
+        htOutOfBand = subInputStream.readBit();
 
         htLow = (int) subInputStream.readBits(32); // & 0xffffffff);
         htHigh = (int) subInputStream.readBits(32); // & 0xffffffff);
     }
 
+    @Override
     public void init(SegmentHeader header, SubInputStream sis)
             throws InvalidHeaderValueException, IOException, IntegerMaxValueException
     {
