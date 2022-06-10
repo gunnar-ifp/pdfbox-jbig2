@@ -26,9 +26,9 @@ import java.io.InputStream;
 
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 import org.junit.Test;
 import org.junit.Assert;
 

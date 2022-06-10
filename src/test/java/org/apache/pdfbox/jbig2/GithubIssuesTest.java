@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.junit.Assert;
 import org.junit.Test;
 

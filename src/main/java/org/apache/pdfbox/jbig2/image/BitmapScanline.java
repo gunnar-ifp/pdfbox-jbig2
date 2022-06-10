@@ -19,8 +19,6 @@ package org.apache.pdfbox.jbig2.image;
 
 import java.awt.image.WritableRaster;
 
-import org.apache.pdfbox.jbig2.Bitmap;
-
 final class BitmapScanline extends Scanline
 {
 

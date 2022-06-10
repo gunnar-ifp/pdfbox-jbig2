@@ -32,7 +32,7 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
 import org.junit.Assert;
 import org.junit.Test;
 

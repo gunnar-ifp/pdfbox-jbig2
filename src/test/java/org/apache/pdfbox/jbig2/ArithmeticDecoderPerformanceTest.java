@@ -25,7 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
 
 /**
  * Arithmetic Decoder performance tests.

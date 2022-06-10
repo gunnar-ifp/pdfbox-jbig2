@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.pdfbox.jbig2.io;
+package org.apache.pdfbox.jbig2.util;
 
 import java.io.IOException;
 

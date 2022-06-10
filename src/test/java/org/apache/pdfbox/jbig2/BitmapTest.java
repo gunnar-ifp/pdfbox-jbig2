@@ -20,6 +20,7 @@ package org.apache.pdfbox.jbig2;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.junit.Test;
 
 public class BitmapTest

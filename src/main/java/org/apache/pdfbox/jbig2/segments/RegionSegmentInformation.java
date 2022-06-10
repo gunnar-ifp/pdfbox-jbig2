@@ -23,8 +23,8 @@ import org.apache.pdfbox.jbig2.SegmentData;
 import org.apache.pdfbox.jbig2.SegmentHeader;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents the "Region segment information" field, 7.4.1 (page 50). <br>

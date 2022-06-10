@@ -20,13 +20,13 @@ package org.apache.pdfbox.jbig2.segments;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.pdfbox.jbig2.Bitmap;
 import org.apache.pdfbox.jbig2.Region;
 import org.apache.pdfbox.jbig2.SegmentHeader;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents the data of segment type "Halftone region". Parsing is described in 7.4.5, page 67. Decoding

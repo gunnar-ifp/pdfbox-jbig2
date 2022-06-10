@@ -23,7 +23,7 @@ import java.util.Arrays;
 
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.pdfbox.jbig2.Bitmap;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 
 /**
  * A decompressor for MMR compression.

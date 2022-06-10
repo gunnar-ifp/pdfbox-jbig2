@@ -23,7 +23,7 @@ import org.apache.pdfbox.jbig2.SegmentData;
 import org.apache.pdfbox.jbig2.SegmentHeader;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This segment flags an end of stripe (see JBIG2 ISO standard, 7.4.9).

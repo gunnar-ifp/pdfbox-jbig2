@@ -29,9 +29,11 @@ import java.io.InputStream;
 import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
 import org.apache.pdfbox.jbig2.image.FilterType;
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.TestImage;
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
 import org.apache.pdfbox.jbig2.segments.EndOfStripe;
 import org.apache.pdfbox.jbig2.segments.PageInformation;

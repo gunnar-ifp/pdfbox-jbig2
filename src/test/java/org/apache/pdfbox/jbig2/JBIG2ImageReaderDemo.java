@@ -30,8 +30,10 @@ import javax.imageio.ImageReadParam;
 import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.err.JBIG2Exception;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.TestImage;
 
 public class JBIG2ImageReaderDemo
 {

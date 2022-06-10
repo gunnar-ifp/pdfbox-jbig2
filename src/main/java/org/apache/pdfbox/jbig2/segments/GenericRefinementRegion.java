@@ -19,14 +19,14 @@ package org.apache.pdfbox.jbig2.segments;
 
 import java.io.IOException;
 
-import org.apache.pdfbox.jbig2.Bitmap;
 import org.apache.pdfbox.jbig2.Region;
 import org.apache.pdfbox.jbig2.SegmentHeader;
 import org.apache.pdfbox.jbig2.decoder.arithmetic.ArithmeticDecoder;
 import org.apache.pdfbox.jbig2.decoder.arithmetic.CX;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
+import org.apache.pdfbox.jbig2.image.Bitmap;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents a generic refinement region and implements the procedure described in JBIG2 ISO standard, 6.3

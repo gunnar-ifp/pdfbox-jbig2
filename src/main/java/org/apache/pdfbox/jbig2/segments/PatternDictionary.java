@@ -21,12 +21,11 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.pdfbox.jbig2.Bitmap;
-import org.apache.pdfbox.jbig2.Dictionary;
 import org.apache.pdfbox.jbig2.SegmentHeader;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents the segment type "Pattern dictionary", 7.4.4.

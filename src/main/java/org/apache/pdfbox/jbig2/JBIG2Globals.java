@@ -28,7 +28,7 @@ import java.util.Map;
  * This segments will be decoded on demand and all results are stored in the document object and can be retrieved from
  * there.
  */
-public class JBIG2Globals
+class JBIG2Globals
 {
     /**
      * This map contains all segments, that are not associated with a page. The key is the segment number.

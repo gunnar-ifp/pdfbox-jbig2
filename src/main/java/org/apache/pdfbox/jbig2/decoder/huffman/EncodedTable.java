@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.pdfbox.jbig2.io.SubInputStream;
 import org.apache.pdfbox.jbig2.segments.Table;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents a encoded huffman table.

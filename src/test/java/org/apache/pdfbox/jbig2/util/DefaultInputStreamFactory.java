@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.pdfbox.jbig2.io;
+package org.apache.pdfbox.jbig2.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +24,10 @@ import javax.imageio.stream.FileCacheImageInputStream;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 
-public class DefaultInputStreamFactory implements InputStreamFactory
+public class DefaultInputStreamFactory
 {
 
-    public ImageInputStream getInputStream(InputStream is)
+    public static ImageInputStream getInputStream(InputStream is)
     {
         try
         {

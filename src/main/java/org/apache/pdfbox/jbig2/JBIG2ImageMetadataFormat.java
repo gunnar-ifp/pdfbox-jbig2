@@ -25,7 +25,7 @@ import javax.imageio.metadata.IIOMetadataFormatImpl;
  * @see IIOMetadataFormat
  * @see IIOMetadataFormatImpl
  */
-public class JBIG2ImageMetadataFormat extends IIOMetadataFormatImpl
+class JBIG2ImageMetadataFormat extends IIOMetadataFormatImpl
 {
 
     private static IIOMetadataFormat instance = null;

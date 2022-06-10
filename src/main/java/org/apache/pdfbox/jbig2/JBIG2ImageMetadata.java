@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
 /**
  * @see IIOMetadata
  */
-public class JBIG2ImageMetadata extends IIOMetadata
+class JBIG2ImageMetadata extends IIOMetadata
 {
 
     static final String IMAGE_METADATA_FORMAT_NAME = "jbig2";

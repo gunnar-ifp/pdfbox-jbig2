@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.segments.RegionSegmentInformation;
 
 /**

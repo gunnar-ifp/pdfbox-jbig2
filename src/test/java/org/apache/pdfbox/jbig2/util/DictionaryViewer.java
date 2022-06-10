@@ -19,8 +19,7 @@ package org.apache.pdfbox.jbig2.util;
 
 import java.util.List;
 
-import org.apache.pdfbox.jbig2.Bitmap;
-import org.apache.pdfbox.jbig2.TestImage;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
 
 /**

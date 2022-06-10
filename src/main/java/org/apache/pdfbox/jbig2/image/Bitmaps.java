@@ -30,7 +30,6 @@ import java.awt.image.WritableRaster;
 
 import javax.imageio.ImageReadParam;
 
-import org.apache.pdfbox.jbig2.Bitmap;
 import org.apache.pdfbox.jbig2.JBIG2ReadParam;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
 

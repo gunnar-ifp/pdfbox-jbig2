@@ -20,7 +20,6 @@ package org.apache.pdfbox.jbig2.image;
 import java.awt.Rectangle;
 import java.awt.image.WritableRaster;
 
-import org.apache.pdfbox.jbig2.Bitmap;
 import org.apache.pdfbox.jbig2.util.Utils;
 
 class Resizer

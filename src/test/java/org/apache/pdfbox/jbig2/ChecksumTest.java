@@ -28,7 +28,8 @@ import java.util.Collection;
 
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.image.Bitmap;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

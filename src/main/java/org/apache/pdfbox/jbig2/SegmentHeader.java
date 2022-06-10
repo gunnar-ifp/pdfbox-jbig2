@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.pdfbox.jbig2.io.SubInputStream;
 import org.apache.pdfbox.jbig2.segments.EndOfStripe;
 import org.apache.pdfbox.jbig2.segments.GenericRefinementRegion;
 import org.apache.pdfbox.jbig2.segments.GenericRegion;
@@ -36,6 +35,7 @@ import org.apache.pdfbox.jbig2.segments.Profiles;
 import org.apache.pdfbox.jbig2.segments.SymbolDictionary;
 import org.apache.pdfbox.jbig2.segments.Table;
 import org.apache.pdfbox.jbig2.segments.TextRegion;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * The basic class for all JBIG2 segments.

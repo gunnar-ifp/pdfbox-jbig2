@@ -21,8 +21,6 @@ import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.apache.pdfbox.jbig2.Bitmap;
-import org.apache.pdfbox.jbig2.Dictionary;
 import org.apache.pdfbox.jbig2.Region;
 import org.apache.pdfbox.jbig2.SegmentHeader;
 import org.apache.pdfbox.jbig2.decoder.arithmetic.ArithmeticDecoder;
@@ -33,8 +31,9 @@ import org.apache.pdfbox.jbig2.decoder.huffman.HuffmanTable;
 import org.apache.pdfbox.jbig2.decoder.huffman.StandardTables;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 import org.apache.pdfbox.jbig2.image.Bitmaps;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents the data of segment type "Symbol dictionary". Parsing is described in 7.4.2.1.1 - 7.4.1.1.5 and

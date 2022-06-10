@@ -26,7 +26,7 @@ import java.util.TreeMap;
 
 import javax.imageio.stream.ImageInputStream;
 
-import org.apache.pdfbox.jbig2.io.SubInputStream;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * This class represents the document structure with its pages and global segments.
@@ -151,17 +151,10 @@ class JBIG2Document
     {
         if (amountOfPagesUnknown || amountOfPages == 0)
         {
-            if (pages.size() == 0)
-            {
-                mapStream();
-            }
-
+            if (pages.size() == 0) mapStream();
             return pages.size();
         }
-        else
-        {
-            return amountOfPages;
-        }
+        return amountOfPages;
     }
 
     /**
@@ -271,9 +264,6 @@ class JBIG2Document
 
     /**
      * This method reads the stream and sets variables for information about organization type and length etc.
-     * 
-     * @return
-     * @throws IOException
      */
     private void parseFileHeader() throws IOException
     {

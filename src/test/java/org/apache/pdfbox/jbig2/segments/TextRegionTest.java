@@ -29,10 +29,10 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.pdfbox.jbig2.JBIG2ImageReader;
 import org.apache.pdfbox.jbig2.JBIG2ImageReaderSpi;
-import org.apache.pdfbox.jbig2.TestImage;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
-import org.apache.pdfbox.jbig2.io.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.DefaultInputStreamFactory;
+import org.apache.pdfbox.jbig2.util.TestImage;
 import org.junit.Ignore;
 import org.junit.Test;
 

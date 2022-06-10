@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.pdfbox.jbig2;
+package org.apache.pdfbox.jbig2.image;
 
 import java.awt.Rectangle;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ public class Bitmap
     private final int rowStride;
 
     /** 8 pixels per byte, 0 for white, 1 for black */
-    private byte[] bitmap;
+    byte[] bitmap;
 
     /**
      * Creates an instance of a blank image.<br>
@@ -72,7 +72,7 @@ public class Bitmap
         int bitOffset = this.getBitOffset(x);
 
         int toShift = 7 - bitOffset;
-        return (byte) ((this.getByte(byteIndex) >> toShift) & 0x01);
+        return (byte) ((bitmap[byteIndex] >> toShift) & 0x01);
     }
 
     public void setPixel(int x, int y, byte pixelValue)

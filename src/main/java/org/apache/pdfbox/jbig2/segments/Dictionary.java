@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.pdfbox.jbig2;
+package org.apache.pdfbox.jbig2.segments;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.pdfbox.jbig2.SegmentData;
 import org.apache.pdfbox.jbig2.err.IntegerMaxValueException;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
+import org.apache.pdfbox.jbig2.image.Bitmap;
 
 /**
  * Interface for all JBIG2 dictionaries segments.
  */
-public interface Dictionary extends SegmentData
+interface Dictionary extends SegmentData
 {
 
     /**

@@ -19,7 +19,7 @@ package org.apache.pdfbox.jbig2.segments;
 
 import org.apache.pdfbox.jbig2.SegmentData;
 import org.apache.pdfbox.jbig2.SegmentHeader;
-import org.apache.pdfbox.jbig2.io.SubInputStream;
+import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
  * <b>TODO:</b> This class is not implemented yet and empty. Wait for use cases.

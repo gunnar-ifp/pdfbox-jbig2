@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.pdfbox.jbig2;
+package org.apache.pdfbox.jbig2.util;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
