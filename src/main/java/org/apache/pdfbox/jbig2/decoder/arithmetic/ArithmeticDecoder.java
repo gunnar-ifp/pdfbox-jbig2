@@ -74,17 +74,17 @@ public class ArithmeticDecoder
         a = 0x8000;
     }
 
-    public int decode(CX cx) throws IOException
+    public int decode(final CX cx, final int index) throws IOException
     {
         int d;
-        final int qeValue = QE[cx.cx()][0];
-        final int icx = cx.cx();
+        final int qeValue = QE[cx.cx(index)][0];
+        final int icx = cx.cx(index);
 
         a -= qeValue;
 
         if ((c >> 16) < qeValue)
         {
-            d = lpsExchange(cx, icx, qeValue);
+            d = lpsExchange(cx, index, icx, qeValue);
             renormalize();
         }
         else
@@ -92,12 +92,12 @@ public class ArithmeticDecoder
             c -= (qeValue << 16);
             if ((a & 0x8000) == 0)
             {
-                d = mpsExchange(cx, icx);
+                d = mpsExchange(cx, index, icx);
                 renormalize();
             }
             else
             {
-                return cx.mps();
+                return cx.mps(index);
             }
         }
 
@@ -156,35 +156,35 @@ public class ArithmeticDecoder
         c &= 0xffffffffL;
     }
 
-    private int mpsExchange(CX cx, int icx)
+    private int mpsExchange(CX cx, int index, int icx)
     {
-        final int mps = cx.mps();
+        final int mps = cx.mps(index);
 
         if (a < QE[icx][0])
         {
 
             if (QE[icx][3] == 1)
             {
-                cx.toggleMps();
+                cx.toggleMps(index);
             }
 
-            cx.setCx(QE[icx][2]);
+            cx.setCx(index, QE[icx][2]);
             return 1 - mps;
         }
         else
         {
-            cx.setCx(QE[icx][1]);
+            cx.setCx(index, QE[icx][1]);
             return mps;
         }
     }
 
-    private int lpsExchange(CX cx, int icx, int qeValue)
+    private int lpsExchange(CX cx, int index, int icx, int qeValue)
     {
-        final int mps = cx.mps();
+        final int mps = cx.mps(index);
 
         if (a < qeValue)
         {
-            cx.setCx(QE[icx][1]);
+            cx.setCx(index, QE[icx][1]);
             a = qeValue;
 
             return mps;
@@ -193,10 +193,10 @@ public class ArithmeticDecoder
         {
             if (QE[icx][3] == 1)
             {
-                cx.toggleMps();
+                cx.toggleMps(index);
             }
 
-            cx.setCx(QE[icx][2]);
+            cx.setCx(index, QE[icx][2]);
             a = qeValue;
             return 1 - mps;
         }

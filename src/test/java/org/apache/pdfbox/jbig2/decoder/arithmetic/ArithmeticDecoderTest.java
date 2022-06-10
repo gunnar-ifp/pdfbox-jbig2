@@ -166,10 +166,10 @@ public class ArithmeticDecoderTest
 
         ArithmeticDecoder decoder = new ArithmeticDecoder(iis);
 
-        CX cx = new CX(1, 0);
+        CX cx = new CX(1);
         for (int i = 0; i < 257; i++)
         {
-            decoder.decode(cx);
+            decoder.decode(cx, 0);
         }
 
     }
@@ -182,11 +182,11 @@ public class ArithmeticDecoderTest
         ImageInputStream iis = factory.getInputStream(is);
 
         ArithmeticDecoder decoder = new ArithmeticDecoder(iis);
-        CX cx = new CX(1, 0);
+        CX cx = new CX(1);
 
         for (int i = 0; i < 255; i++)
         {
-            Assert.assertEquals(tracedata[i][0], decoder.decode(cx));
+            Assert.assertEquals(tracedata[i][0], decoder.decode(cx, 0));
             Assert.assertEquals(tracedata[i + 1][1], (long) decoder.getA());
             Assert.assertEquals(tracedata[i + 1][2], decoder.getC());
 

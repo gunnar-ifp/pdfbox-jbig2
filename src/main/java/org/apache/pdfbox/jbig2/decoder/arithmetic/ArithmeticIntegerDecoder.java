@@ -55,36 +55,30 @@ public class ArithmeticIntegerDecoder
 
         int prev = 1;
 
-        cxIAx.setIndex(prev);
-        s = decoder.decode(cxIAx);
+        s = decoder.decode(cxIAx, prev);
         prev = setPrev(prev, s);
 
-        cxIAx.setIndex(prev);
-        d = decoder.decode(cxIAx);
+        d = decoder.decode(cxIAx, prev);
         prev = setPrev(prev, d);
 
         if (d == 1)
         {
-            cxIAx.setIndex(prev);
-            d = decoder.decode(cxIAx);
+            d = decoder.decode(cxIAx, prev);
             prev = setPrev(prev, d);
 
             if (d == 1)
             {
-                cxIAx.setIndex(prev);
-                d = decoder.decode(cxIAx);
+                d = decoder.decode(cxIAx, prev);
                 prev = setPrev(prev, d);
 
                 if (d == 1)
                 {
-                    cxIAx.setIndex(prev);
-                    d = decoder.decode(cxIAx);
+                    d = decoder.decode(cxIAx, prev);
                     prev = setPrev(prev, d);
 
                     if (d == 1)
                     {
-                        cxIAx.setIndex(prev);
-                        d = decoder.decode(cxIAx);
+                        d = decoder.decode(cxIAx, prev);
                         prev = setPrev(prev, d);
 
                         if (d == 1)
@@ -124,8 +118,7 @@ public class ArithmeticIntegerDecoder
 
         for (int i = 0; i < bitsToRead; i++)
         {
-            cxIAx.setIndex(prev);
-            d = decoder.decode(cxIAx);
+            d = decoder.decode(cxIAx, prev);
             prev = setPrev(prev, d);
             v = (v << 1) | d;
         }
@@ -168,8 +161,7 @@ public class ArithmeticIntegerDecoder
         // A.3 2)
         for (int i = 0; i < symCodeLen; i++)
         {
-            cxIAID.setIndex(prev);
-            prev = (prev << 1) | decoder.decode(cxIAID);
+            prev = (prev << 1) | decoder.decode(cxIAID, prev);
         }
 
         // A.3 3) & 4)

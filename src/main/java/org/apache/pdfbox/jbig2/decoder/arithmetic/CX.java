@@ -23,8 +23,6 @@ package org.apache.pdfbox.jbig2.decoder.arithmetic;
  */
 public final class CX
 {
-    private int index;
-
     private final byte cx[];
     private final byte mps[];
 
@@ -33,28 +31,16 @@ public final class CX
      */
     public CX(int size)
     {
-        this.index = 1;
         cx = new byte[size];
         mps = new byte[size];
     }
 
-    /**
-     * @param size - Amount of context values.
-     * @param index - Start index.
-     */
-    CX(int size, int index)
-    {
-        this.index = index;
-        cx = new byte[size];
-        mps = new byte[size];
-    }
-
-    protected int cx()
+    protected int cx(int index)
     {
         return cx[index] & 0x7f;
     }
 
-    protected void setCx(int value)
+    protected void setCx(int index, int value)
     {
         cx[index] = (byte) (value & 0x7f);
     }
@@ -62,7 +48,7 @@ public final class CX
     /**
      * @return The decision. Possible values are {@code 0} or {@code 1}.
      */
-    protected byte mps()
+    protected byte mps(int index)
     {
         return mps[index];
     }
@@ -70,18 +56,9 @@ public final class CX
     /**
      * Flips the bit in actual "more predictable symbol" array element.
      */
-    protected void toggleMps()
+    protected void toggleMps(int index)
     {
         mps[index] ^= 1;
     }
 
-    protected int getIndex()
-    {
-        return index;
-    }
-
-    public void setIndex(int index)
-    {
-        this.index = index;
-    }
 }
