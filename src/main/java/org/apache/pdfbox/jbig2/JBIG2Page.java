@@ -18,6 +18,9 @@
 package org.apache.pdfbox.jbig2;
 
 import java.io.IOException;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +51,7 @@ class JBIG2Page
 
     /** The page bitmap that represents the page buffer */
     private Bitmap pageBitmap;
+    private Reference<Bitmap> cache;
 
     private int finalHeight;
     private int finalWidth;
@@ -114,7 +118,13 @@ class JBIG2Page
     {
         if (null == pageBitmap)
         {
-            composePageBitmap();
+            if ( cache!=null ) {
+                pageBitmap = cache.get();
+                cache = null;
+            }
+            if ( pageBitmap==null ) {
+                composePageBitmap();
+            }
         }
         return pageBitmap;
     }
@@ -308,17 +318,9 @@ class JBIG2Page
      * @param newOperator - The combination operator, specified by actual segment
      * @return the new combination operator
      */
-    private CombinationOperator getCombinationOperator(PageInformation pi,
-            CombinationOperator newOperator)
+    private CombinationOperator getCombinationOperator(PageInformation pi, CombinationOperator newOperator)
     {
-        if (pi.isCombinationOperatorOverrideAllowed())
-        {
-            return newOperator;
-        }
-        else
-        {
-            return pi.getCombinationOperator();
-        }
+        return pi.isCombinationOperatorOverrideAllowed() ? newOperator : pi.getCombinationOperator();
     }
 
     /**
@@ -328,7 +330,6 @@ class JBIG2Page
      */
     protected void add(SegmentHeader segment)
     {
-
         segments.put(segment.getSegmentNr(), segment);
     }
 
@@ -351,6 +352,25 @@ class JBIG2Page
      */
     protected void clearPageData()
     {
+        pageBitmap = null;
+        cache = null;
+        
+    }
+
+    protected void clearPageData(JBIG2ReadParam.PageCacheMode cs)
+    {
+        switch (cs) {
+            case WEAK:
+                cache = pageBitmap==null ? null : new WeakReference<Bitmap>(pageBitmap);
+                break;
+                
+            case SOFT:
+                cache = pageBitmap==null ? null : new SoftReference<Bitmap>(pageBitmap);
+                break;
+
+            default:
+                cache = null;
+        }
         pageBitmap = null;
     }
 

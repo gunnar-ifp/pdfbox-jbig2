@@ -27,6 +27,13 @@ import javax.imageio.ImageReadParam;
  */
 public class JBIG2ReadParam extends ImageReadParam
 {
+    public enum PageCacheMode {
+        NONE, SOFT, WEAK
+    }
+    
+
+    private PageCacheMode pageCacheMode = PageCacheMode.SOFT;
+    
 
     public JBIG2ReadParam()
     {
@@ -51,5 +58,23 @@ public class JBIG2ReadParam extends ImageReadParam
 
         setSourceSubsampling(sourceXSubsampling, sourceYSubsampling, subsamplingXOffset,
                 subsamplingYOffset);
+    }
+    
+    
+    /**
+     * @param pageCacheMode the pageCacheMode to set
+     */
+    public void setPageCacheMode(PageCacheMode pageCacheMode)
+    {
+        this.pageCacheMode = pageCacheMode;
+    }
+    
+    
+    /**
+     * @return the pageCacheMode
+     */
+    public PageCacheMode getPageCacheMode()
+    {
+        return pageCacheMode;
     }
 }
