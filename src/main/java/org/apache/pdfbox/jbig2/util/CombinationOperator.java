@@ -22,22 +22,20 @@ package org.apache.pdfbox.jbig2.util;
  */
 public enum CombinationOperator
 {
-    OR, AND, XOR, XNOR, REPLACE;
-
-    public static CombinationOperator translateOperatorCodeToEnum(short combinationOperatorCode)
+    /** JBIG 2 standard */
+    OR, AND, XOR, XNOR, REPLACE,
+    /** INTERNAL, cannot be created from JBIG 2 code */
+    NOT;
+    
+    public static CombinationOperator translateOperatorCodeToEnum(short code)
     {
-        switch (combinationOperatorCode)
+        switch (code)
         {
-        case 0:
-            return OR;
-        case 1:
-            return AND;
-        case 2:
-            return XOR;
-        case 3:
-            return XNOR;
-        default:
-            return REPLACE;
-        }
+            case 0:  return OR;
+            case 1:  return AND;
+            case 2:  return XOR;
+            case 3:  return XNOR;
+            default: return REPLACE;
+         }
     }
 }

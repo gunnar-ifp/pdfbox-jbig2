@@ -17,6 +17,7 @@
 
 package org.apache.pdfbox.jbig2.image;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -25,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.imageio.stream.ImageInputStream;
 
@@ -85,4 +87,41 @@ public class BitmapsBlitTest
         assertTrue(src.equals(dstRegionBitmap));
     }
 
+
+    @Test
+    public void testShiftReplace() throws IOException, JBIG2Exception
+    {
+        final int bytes = 16, pixels = bytes * 8, lines = 1;
+        Bitmap src = new Bitmap(pixels, lines);
+        Bitmap dst = new Bitmap(pixels + 6, lines + 1);
+        fillBitmap(src, 0);
+
+        final int end = bytes - 1;
+        for ( int blit = -8; blit <= 8; blit++ ) {
+            Arrays.fill(dst.bitmap, (byte)-1);
+            Bitmaps.blit(src, dst, blit, 0, CombinationOperator.REPLACE);
+            for ( int i = 0, last = (pixels + blit - 1) / 8; i<=last; i++ ) {
+                int s =
+                    ( i == 0     ? 0xff55aa
+                    : i==end     ? 0x55aaff
+                    : i> end     ? 0xaaffff
+                    : i % 2 == 0 ? 0xaa55aa : 0x55aa55);
+                s = (s >> blit + 8) & 0xff;
+                // this is because dst is only 6 pixels wider!
+                if ( i>end ) s |= 3;
+                int b = 0xff & dst.bitmap[i];
+                assertEquals(blit + ":[" + i + "]", s, b);
+            }
+        }
+    }
+
+    
+    private static void fillBitmap(Bitmap bitmap, int toggle)
+    {
+    for ( int y = 0, idx = 0; y<bitmap.getHeight(); y++ ) {
+        for ( int x = 0; x<bitmap.getRowStride(); x++ ) bitmap.bitmap[idx++] = (byte)((toggle + y + x) % 2 == 0 ? 0x55 : 0xaa);
+    }
+        
+    }
+    
 }

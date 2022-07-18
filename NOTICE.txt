@@ -3,3 +3,6 @@ Copyright 2017 The Apache Software Foundation
 
 Based on source code originally developed in the JBig2 project.
 Copyright (C) 1995-2017 levigo holding GmbH
+
+Additional source code donated by interface projects GmbH.
+Copyright (C) 2022 interface projects GmbH
