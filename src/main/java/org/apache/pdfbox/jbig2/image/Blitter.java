@@ -119,97 +119,98 @@ final class Blitter
         int headMask   = trimByte(0xff, shiftRight, 8 - headBits - shiftRight);
         int tailMask   = trimByte(0xff, 0,          8 - tailBits);
         
+        // the inner loop only ever shifts right, so if we need to shift left,
+        // we offset it by 8 (loading an additional source byte if necessary). 
         int shiftDelta = shiftRight - shiftLeft;
         int preShift   = 0;
-        int firstBits  = 8 - shiftLeft;
         if ( shiftLeft>shiftRight ) {
             shiftDelta += 8;
-            preShift = firstBits<headBits ? -1 : 1; // firstBits - headBits; 
+            preShift = 8 - shiftLeft<headBits ? -1 : 1; 
         }
 
-        // note: be aware that out is incremented according to java expression left-to-right syntax
-        // to make combination operations easy to write.   
+        switch (operator) {
+            case OR:
+                blitOr(src, srcOffset, srcRowStride, dst, dstOffset, dstRowStride, srcHeight,
+                    shiftDelta, preShift, headBits, fullBytes, tailBits, headMask, tailMask);
+                break;
+                
+            case AND:
+                blitAnd(src, srcOffset, srcRowStride, dst, dstOffset, dstRowStride, srcHeight,
+                    shiftDelta, preShift, headBits, fullBytes, tailBits, headMask, tailMask);
+                break;
+                
+            case XOR:
+                blitXor(src, srcOffset, srcRowStride, dst, dstOffset, dstRowStride, srcHeight,
+                    shiftDelta, preShift, headBits, fullBytes, tailBits, headMask, tailMask);
+                break;
+                
+            case XNOR:
+                blitXnor(src, srcOffset, srcRowStride, dst, dstOffset, dstRowStride, srcHeight,
+                    shiftDelta, preShift, headBits, fullBytes, tailBits, headMask, tailMask);
+                break;
+                
+            case REPLACE:
+                blitReplace(src, srcOffset, srcRowStride, dst, dstOffset, dstRowStride, srcHeight,
+                    shiftDelta, preShift, headBits, fullBytes, tailBits, headMask, tailMask);
+                break;
+                
+            case NOT:
+                blitNot(src, srcOffset, srcRowStride, dst, dstOffset, dstRowStride, srcHeight,
+                    shiftDelta, preShift, headBits, fullBytes, tailBits, headMask, tailMask);
+                break;
+        }
+    }
+    
+    
+    private static void blitOr(
+        byte[] src, int srcOffset, int srcRowStride, byte[] dst, int dstOffset, int dstRowStride, int height,
+        int shiftDelta, int preShift, int headBits, int fullBytes, int tailBits, int headMask, int tailMask)
+    {
         int in = srcOffset, out = dstOffset;
-        while ( --srcHeight>=0 ) {
-            // Unshifted: first and last byte might be partial but in between it is byte to byte.
-            // Shifted to the right: first src byte split over up to two dst bytes.
-            // Shifted to the left:  first or first two src bytes make up a dst byte.
+        // speeds up halftone rendering quite a bit but otherwise slows things down for C2
+        /*
+        if ( preShift==0 && fullBytes==0 && shiftDelta>=tailBits ) {
+            if ( tailMask==0 ) {
+                while ( --height>=0 ) {
+                    dst[out] |= headMask & src[in] >> shiftDelta;
+                    in  = srcOffset += srcRowStride;
+                    out = dstOffset += dstRowStride;
+                }
+            } else {
+                final int tailShift = 8 - shiftDelta;
+                while ( --height>=0 ) {
+                    int reg = src[in];
+                    dst[out    ] |= headMask & reg >> shiftDelta;
+                    dst[out + 1] |= tailMask & reg << tailShift;
+                    in  = srcOffset += srcRowStride;
+                    out = dstOffset += dstRowStride;
+                }
+            }
+        }
+        else
+        //*/
+        while ( --height>=0 ) {
             int reg = src[in++] & 0xff;
             if ( preShift!=0 ) {
                 reg <<= 8;
                 if ( preShift<0 ) reg |= src[in++] & 0xff;
             }
     
-            dst[out] = (byte)
-                (~headMask & dst[out] 
-                | headMask & combineByte(reg >> shiftDelta, dst[out], operator));
-
-            
+            dst[out] |= headMask & reg >> shiftDelta;
+    
             if ( fullBytes==0 ) {
                 // do nothing
             }
             else if ( shiftDelta==0 ) {
-                switch (operator) {
-                    case OR:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] |= src[in++];
-                        break;
-                        
-                    case AND:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] &= src[in++];
-                        break;
-                        
-                    case XOR:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] ^= src[in++];
-                        break;
-                        
-                    case XNOR:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(dst[out] ^ src[in++]);
-                        break;
-                        
-                    case REPLACE:
-                        System.arraycopy(src, in, dst, out + 1, fullBytes);
-                        in  += fullBytes;
-                        out += fullBytes;
-                        break;
-                        
-                    case NOT:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(src[in++]);
-                        break;
-                }
+                for ( int c = fullBytes; --c>=0; ) dst[++out] |= src[in++];
             }
             else {
-                switch (operator) {
-                    case OR:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] |= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
-                        break;
-                        
-                    case AND:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] &= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
-                        break;
-                        
-                    case XOR:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] ^= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
-                        break;
-                        
-                    case XNOR:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(dst[out] ^ (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
-                        break;
-                    
-                    case REPLACE:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)((reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
-                        break;
-                        
-                    case NOT:
-                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~((reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
-                        break;
-                }
+                for ( int c = fullBytes; --c>=0; ) dst[++out] |= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
             }
     
             if ( tailBits!=0 ) {
                 reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
-                dst[++out] = (byte)
-                    (~tailMask & dst[out]
-                    | tailMask & combineByte(reg >> shiftDelta, dst[out], operator));
+                dst[++out] |= tailMask & reg >> shiftDelta;
             }
             
             in  = srcOffset += srcRowStride;
@@ -218,25 +219,191 @@ final class Blitter
     }
 
     
-    /**
-     * Combines a source byte with the destination byte according
-     * to JBIG2 combination rules and returns the new destination byte.
-     */
-    private static int combineByte(int src, int dst, CombinationOperator operator)
+    private static void blitAnd(
+        byte[] src, int srcOffset, int srcRowStride, byte[] dst, int dstOffset, int dstRowStride, int height,
+        int shiftDelta, int preShift, int headBits, int fullBytes, int tailBits, int headMask, int tailMask)
     {
-        switch (operator)
-        {
-            case OR:      return   dst | src;
-            case AND:     return   dst & src;
-            case XOR:     return   dst ^ src;
-            case XNOR:    return ~(dst ^ src);
-            case REPLACE: return         src;
-            case NOT:     return        ~src;
+        headMask = ~headMask;
+        tailMask = ~tailMask;
+            
+        int in = srcOffset, out = dstOffset;
+        while ( --height>=0 ) {
+            int reg = src[in++] & 0xff;
+            if ( preShift!=0 ) {
+                reg <<= 8;
+                if ( preShift<0 ) reg |= src[in++] & 0xff;
+            }
+    
+            dst[out] &= headMask | reg >> shiftDelta;
+    
+            if ( fullBytes==0 ) {
+                // do nothing
+            }
+            else if ( shiftDelta==0 ) {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] &= src[in++];
+            }
+            else {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] &= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
+            }
+    
+            if ( tailBits!=0 ) {
+                reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
+                dst[++out] &= tailMask | reg >> shiftDelta;
+            }
+            
+            in  = srcOffset += srcRowStride;
+            out = dstOffset += dstRowStride;
         }
-        return src;
     }
     
     
+    private static void blitXor(
+        byte[] src, int srcOffset, int srcRowStride, byte[] dst, int dstOffset, int dstRowStride, int height,
+        int shiftDelta, int preShift, int headBits, int fullBytes, int tailBits, int headMask, int tailMask)
+    {
+        int in = srcOffset, out = dstOffset;
+        while ( --height>=0 ) {
+            int reg = src[in++] & 0xff;
+            if ( preShift!=0 ) {
+                reg <<= 8;
+                if ( preShift<0 ) reg |= src[in++] & 0xff;
+            }
+    
+            dst[out] ^= headMask & reg >> shiftDelta;
+
+            if ( fullBytes==0 ) {
+                // do nothing
+            }
+            else if ( shiftDelta==0 ) {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] ^= src[in++];
+            }
+            else {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] ^= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
+            }
+    
+            if ( tailBits!=0 ) {
+                reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
+                dst[++out] ^= tailMask & reg >> shiftDelta;
+            }
+            
+            in  = srcOffset += srcRowStride;
+            out = dstOffset += dstRowStride;
+        }
+    }
+    
+    
+    private static void blitXnor(
+        byte[] src, int srcOffset, int srcRowStride, byte[] dst, int dstOffset, int dstRowStride, int height,
+        int shiftDelta, int preShift, int headBits, int fullBytes, int tailBits, int headMask, int tailMask)
+    {
+        // note: be aware that out is incremented according to java expression left-to-right syntax
+        // to make combination operations easy to write.   
+        int in = srcOffset, out = dstOffset;
+        while ( --height>=0 ) {
+            int reg = src[in++] & 0xff;
+            if ( preShift!=0 ) {
+                reg <<= 8;
+                if ( preShift<0 ) reg |= src[in++] & 0xff;
+            }
+    
+            dst[out] = (byte)(~headMask & dst[out] | headMask & ~(dst[out] ^ reg >> shiftDelta));
+    
+            if ( fullBytes==0 ) {
+                // do nothing
+            }
+            else if ( shiftDelta==0 ) {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(dst[out] ^ src[in++]);
+            }
+            else {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(dst[out] ^ (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
+            }
+    
+            if ( tailBits!=0 ) {
+                reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
+                dst[++out] = (byte)(~tailMask & dst[out] | tailMask & ~(dst[out] ^ reg >> shiftDelta));
+            }
+            
+            in  = srcOffset += srcRowStride;
+            out = dstOffset += dstRowStride;
+        }
+    }
+    
+    
+    private static void blitReplace(
+        byte[] src, int srcOffset, int srcRowStride, byte[] dst, int dstOffset, int dstRowStride, int height,
+        int shiftDelta, int preShift, int headBits, int fullBytes, int tailBits, int headMask, int tailMask)
+    {
+        int in = srcOffset, out = dstOffset;
+        while ( --height>=0 ) {
+            int reg = src[in++] & 0xff;
+            if ( preShift!=0 ) {
+                reg <<= 8;
+                if ( preShift<0 ) reg |= src[in++] & 0xff;
+            }
+    
+            dst[out] = (byte)(~headMask & dst[out] | headMask & reg >> shiftDelta);
+    
+            if ( fullBytes==0 ) {
+                // do nothing
+            }
+            else if ( shiftDelta==0 ) {
+                System.arraycopy(src, in, dst, out + 1, fullBytes);
+                in  += fullBytes;
+                out += fullBytes;
+            }
+            else {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)((reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
+            }
+    
+            if ( tailBits!=0 ) {
+                reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
+                dst[++out] = (byte)(~tailMask & dst[out] | tailMask & reg >> shiftDelta);
+            }
+            
+            in  = srcOffset += srcRowStride;
+            out = dstOffset += dstRowStride;
+        }
+    }
+    
+
+    /**
+     * Unofficial extension
+     */
+    private static void blitNot(
+        byte[] src, int srcOffset, int srcRowStride, byte[] dst, int dstOffset, int dstRowStride, int height,
+        int shiftDelta, int preShift, int headBits, int fullBytes, int tailBits, int headMask, int tailMask)
+    {
+        int in = srcOffset, out = dstOffset;
+        while ( --height>=0 ) {
+            int reg = src[in++] & 0xff;
+            if ( preShift!=0 ) {
+                reg <<= 8;
+                if ( preShift<0 ) reg |= src[in++] & 0xff;
+            }
+    
+            dst[out] = (byte)(~headMask & dst[out] | headMask & ~(reg >> shiftDelta));
+    
+            if ( fullBytes==0 ) {
+                // do nothing
+            }
+            else if ( shiftDelta==0 ) {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(src[in++]);
+            }
+            else {
+                for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~((reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
+            }
+    
+            if ( tailBits!=0 ) {
+                reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
+                dst[++out] = (byte)(~tailMask & dst[out] | tailMask & ~(reg >> shiftDelta));
+            }
+            
+            in  = srcOffset += srcRowStride;
+            out = dstOffset += dstRowStride;
+        }
+    }
+
+
     static int trimByte(int value, int left, int right)
     {
         return (0xff >> left) & (0xff << right) & value;
