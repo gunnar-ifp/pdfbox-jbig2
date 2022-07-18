@@ -145,9 +145,64 @@ final class Blitter
                 | headMask & combineByte(reg >> shiftDelta, dst[out], operator));
 
             
-            for ( int c = fullBytes; --c>=0; ) {
-                reg = reg << 8 | src[in++] & 0xff;
-                dst[++out] = (byte)combineByte(reg >> shiftDelta, dst[out], operator);
+            if ( fullBytes==0 ) {
+                // do nothing
+            }
+            else if ( shiftDelta==0 ) {
+                switch (operator) {
+                    case OR:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] |= src[in++];
+                        break;
+                        
+                    case AND:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] &= src[in++];
+                        break;
+                        
+                    case XOR:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] ^= src[in++];
+                        break;
+                        
+                    case XNOR:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(dst[out] ^ src[in++]);
+                        break;
+                        
+                    case REPLACE:
+                        System.arraycopy(src, in, dst, out + 1, fullBytes);
+                        in  += fullBytes;
+                        out += fullBytes;
+                        break;
+                        
+                    case NOT:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(src[in++]);
+                        break;
+                }
+            }
+            else {
+                switch (operator) {
+                    case OR:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] |= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
+                        break;
+                        
+                    case AND:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] &= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
+                        break;
+                        
+                    case XOR:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] ^= (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta;
+                        break;
+                        
+                    case XNOR:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~(dst[out] ^ (reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
+                        break;
+                    
+                    case REPLACE:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)((reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
+                        break;
+                        
+                    case NOT:
+                        for ( int c = fullBytes; --c>=0; ) dst[++out] = (byte)~((reg = reg << 8 | src[in++] & 0xff) >> shiftDelta);
+                        break;
+                }
             }
     
             if ( tailBits!=0 ) {
