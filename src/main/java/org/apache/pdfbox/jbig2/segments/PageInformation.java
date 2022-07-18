@@ -49,7 +49,7 @@ public class PageInformation implements SegmentData
     private boolean combinationOperatorOverrideAllowed;
     private CombinationOperator combinationOperator;
     private boolean requiresAuxiliaryBuffer;
-    private short defaultPixelValue;
+    private boolean defaultPixelValue;
     private boolean mightContainRefinements;
     private boolean isLossless;
 
@@ -125,7 +125,7 @@ public class PageInformation implements SegmentData
     private void readDefaultPixelvalue() throws IOException
     {
         /* Bit 2 */
-        defaultPixelValue = (short) subInputStream.readBit();
+        defaultPixelValue = subInputStream.readBit() == 1;
     }
 
     private void readContainsRefinement() throws IOException
@@ -196,9 +196,12 @@ public class PageInformation implements SegmentData
         return resolutionY;
     }
 
-    public short getDefaultPixelValue()
+    /**
+     * Returns the default pixel value, which is either {@code 0} or {@code 1}.
+     */
+    public int getDefaultPixelValue()
     {
-        return defaultPixelValue;
+        return defaultPixelValue ? 1 : 0;
     }
 
     public boolean isCombinationOperatorOverrideAllowed()

@@ -378,17 +378,10 @@ public class TextRegion implements Region
 
     private void createRegionBitmap()
     {
-
         /* 6.4.5 */
-        final int width = regionInfo.getBitmapWidth();
-        final int height = regionInfo.getBitmapHeight();
-        regionBitmap = new Bitmap(width, height);
-
-        /* 1) */
-        if (defaultPixel != 0)
-        {
-            regionBitmap.fillBitmap((byte) 0xff);
-        }
+        regionBitmap = new Bitmap(
+            regionInfo.getBitmapWidth(), regionInfo.getBitmapHeight(),
+            defaultPixel); // 1)
     }
 
     private final long decodeStripT() throws IOException, InvalidHeaderValueException

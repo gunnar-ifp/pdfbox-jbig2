@@ -166,14 +166,10 @@ class JBIG2Page
             throws IOException, IntegerMaxValueException, InvalidHeaderValueException
     {
 
-        pageBitmap = new Bitmap(pageInformation.getWidth(), pageInformation.getHeight());
-
         // Page 79, 3)
         // If default pixel value is not 0, byte will be filled with 0xff
-        if (pageInformation.getDefaultPixelValue() != 0)
-        {
-            pageBitmap.fillBitmap((byte) 0xff);
-        }
+        pageBitmap = new Bitmap(pageInformation.getWidth(), pageInformation.getHeight(),
+            pageInformation.getDefaultPixelValue());
 
         for (SegmentHeader s : segments.values())
         {

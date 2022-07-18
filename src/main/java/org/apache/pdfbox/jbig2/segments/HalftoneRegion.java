@@ -155,17 +155,13 @@ public class HalftoneRegion implements Region
 
             /* 6.6.5, page 40 */
             /* 1) */
-            halftoneRegionBitmap = new Bitmap(regionInfo.getBitmapWidth(),
-                    regionInfo.getBitmapHeight());
+            halftoneRegionBitmap = new Bitmap(
+                regionInfo.getBitmapWidth(), regionInfo.getBitmapHeight(),
+                hDefaultPixel);
 
             if (patterns == null)
             {
                 patterns = getPatterns();
-            }
-
-            if (hDefaultPixel == 1)
-            {
-                halftoneRegionBitmap.fillBitmap((byte) 0xff);
             }
 
             /* 2) */

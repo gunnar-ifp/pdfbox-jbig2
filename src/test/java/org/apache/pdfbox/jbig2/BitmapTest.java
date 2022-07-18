@@ -32,7 +32,7 @@ public class BitmapTest
         final Bitmap bitmap = new Bitmap(37, 49);
         assertEquals(0, bitmap.getPixel(3, 19));
 
-        bitmap.setPixel(3, 19, (byte) 1);
+        bitmap.setPixel(3, 19);
 
         assertEquals(1, bitmap.getPixel(3, 19));
     }

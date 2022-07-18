@@ -17,26 +17,35 @@
 
 package org.apache.pdfbox.jbig2.image;
 
+import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.util.Arrays;
 
 /**
  * This class represents a bi-level image that is organized like a bitmap.
+ * <p>
+ * Each pixel can have the value {@code 0} or {@code 1}. {@code 0} represents white, or background
+ * and {@code 1} represents black, or foreground. Pixel outside the bitmap shall have the value {@code 0}.
+ * <p>
+ * The bitmap is a top-down, left-to-right bitmap, and 8 pixels are stored per byte.
+ * Pixels are packed into bytes starting with the most significant bit. The most significant bit
+ * is numbered 7, while the least significant bit is numbered 0. Thus a single
+ * pixel set to black at {@code (0, 0)} with the following 7 pixels being unset is represented by
+ * the byte {@code 0x80}.
  */
-public class Bitmap
+public final class Bitmap implements Cloneable
 {
+    /** The width of the bitmap in pixels. */
+    private final int width;
 
     /** The height of the bitmap in pixels. */
     private final int height;
 
-    /** The width of the bitmap in pixels. */
-    private final int width;
-
     /** The amount of bytes used per row. */
     private final int rowStride;
 
-    /** 8 pixels per byte, 0 for white, 1 for black */
-    byte[] bitmap;
+    /** 8 pixels per byte, 0 for white, 1 for black, MSB first. */
+    final byte[] bitmap;
 
     /**
      * Creates an instance of a blank image.<br>
@@ -49,13 +58,104 @@ public class Bitmap
      */
     public Bitmap(int width, int height)
     {
-        this.height = height;
         this.width = width;
+        this.height = height;
         this.rowStride = (width + 7) >> 3;
-
-        bitmap = new byte[this.height * this.rowStride];
+        this.bitmap = new byte[rowStride * height];
     }
 
+    
+    public Bitmap(int width, int height, int defaultPixelValue)
+    {
+        this(width, height);
+        if ( defaultPixelValue!=0 ) {
+            // emulate old behvaiour with padding pixels until side effects are known.
+            //Bitmaps.fill(this, defaultPixelValue);
+            Blitter.fill(bitmap, rowStride * 8, height, rowStride, defaultPixelValue);
+        }
+    }
+    
+    
+    private Bitmap(Bitmap other)
+    {
+        this.width = other.width;
+        this.height = other.height;
+        this.rowStride = other.rowStride;
+        this.bitmap = other.bitmap.clone();
+    }
+    
+
+    /**
+     * Simply returns the width of this bitmap.
+     * 
+     * @return The width of this bitmap.
+     */
+    public int getWidth()
+    {
+        return width;
+    }
+
+
+    /**
+     * Simply returns the height of this bitmap.
+     * 
+     * @return The height of this bitmap.
+     */
+    public int getHeight()
+    {
+        return height;
+    }
+
+    
+    public Dimension getDimensions()
+    {
+        return new Dimension(width, height);
+    }
+
+    
+    public Rectangle getBounds()
+    {
+        return new Rectangle(0, 0, width, height);
+    }
+
+
+    /**
+     * Simply returns the row stride of this bitmap. <br>
+     * (Row stride means the amount of bytes per line.)
+     * 
+     * @return The row stride of this bitmap.
+     */
+    public int getRowStride()
+    {
+        return rowStride;
+    }
+
+    
+    /**
+     * Simply returns the byte array of this bitmap.
+     * 
+     * @return The byte array of this bitmap.
+     * 
+     * @deprecated don't expose the underlying byte array, will be removed in a future release.
+     */
+    @Deprecated
+    public byte[] getByteArray()
+    {
+        return bitmap;
+    }
+
+    
+    /**
+     * Returns the length of the underlying byte array.
+     * 
+     * @return byte array length
+     */
+    public int getLength()
+    {
+        return bitmap.length;
+    }
+
+    
     /**
      * Returns the value of a pixel specified by the given coordinates.
      * <p>
@@ -68,25 +168,20 @@ public class Bitmap
      */
     public byte getPixel(int x, int y)
     {
-        int byteIndex = this.getByteIndex(x, y);
-        int bitOffset = this.getBitOffset(x);
-
-        int toShift = 7 - bitOffset;
-        return (byte) ((bitmap[byteIndex] >> toShift) & 0x01);
+        int byteIndex = getByteIndex(x, y);
+        return (byte) ((bitmap[byteIndex] >> getBitOffset(x)) & 1);
     }
 
-    public void setPixel(int x, int y, byte pixelValue)
+    
+    /**
+     * Sets a pixel.
+     */
+    public void setPixel(int x, int y)
     {
-        final int byteIndex = getByteIndex(x, y);
-        final int bitOffset = getBitOffset(x);
-
-        final int shift = 7 - bitOffset;
-
-        final byte src = bitmap[byteIndex];
-        final byte result = (byte) (src | (pixelValue << shift));
-        bitmap[byteIndex] = result;
+        bitmap[getByteIndex(x, y)] |= (1 << getBitOffset(x));
     }
 
+    
     /**
      * 
      * <p>
@@ -101,21 +196,11 @@ public class Bitmap
         return y * this.rowStride + (x >> 3);
     }
 
-    /**
-     * Simply returns the byte array of this bitmap.
-     * 
-     * @return The byte array of this bitmap.
-     * 
-     * @deprecated don't expose the underlying byte array, will be removed in a future release.
-     */
-    public byte[] getByteArray()
-    {
-        return bitmap;
-    }
-
+    
     /**
      * Simply returns a byte from the bitmap byte array. Throws an {@link IndexOutOfBoundsException} if the given index
-     * is out of bound.
+     * is out of bound.<br>
+     * Any pixels outside the bitmap due to the width not being a multiple of 8 will be returned, too.
      * 
      * @param index - The array index that specifies the position of the wanted byte.
      * @return The byte at the {@code index}-position.
@@ -127,9 +212,11 @@ public class Bitmap
         return this.bitmap[index];
     }
 
+    
     /**
      * Simply sets the given value at the given array index position. Throws an {@link IndexOutOfBoundsException} if the
-     * given index is out of bound.
+     * given index is out of bound.<br>
+     * Any pixels outside the bitmap due to the width not being a multiple of 8 will be overwritten, too.
      * 
      * @param index - The array index that specifies the position of a byte.
      * @param value - The byte that should be set.
@@ -141,9 +228,11 @@ public class Bitmap
         this.bitmap[index] = value;
     }
 
+    
     /**
      * Converts the byte at specified index into an integer and returns the value. Throws an
-     * {@link IndexOutOfBoundsException} if the given index is out of bound.
+     * {@link IndexOutOfBoundsException} if the given index is out of bound.<br>
+     * Any pixels outside the bitmap due to the width not being a multiple of 8 will be returned, too.
      * 
      * @param index - The array index that specifies the position of the wanted byte.
      * @return The converted byte at the {@code index}-position as an integer.
@@ -154,88 +243,7 @@ public class Bitmap
     {
         return (this.bitmap[index] & 0xff);
     }
-
-    /**
-     * Computes the offset of the given x coordinate in its byte. The method uses optimized modulo operation for a
-     * better performance.
-     * 
-     * @param x - The x coordinate of a pixel.
-     * @return The bit offset of a pixel in its byte.
-     */
-    public int getBitOffset(int x)
-    {
-        // The same like x % 8.
-        // The rightmost three bits are 1. The value masks all bits upon the value "7".
-        return (x & 0x07);
-    }
-
-    /**
-     * Simply returns the height of this bitmap.
-     * 
-     * @return The height of this bitmap.
-     */
-    public int getHeight()
-    {
-        return height;
-    }
-
-    /**
-     * Simply returns the width of this bitmap.
-     * 
-     * @return The width of this bitmap.
-     */
-    public int getWidth()
-    {
-        return width;
-    }
-
-    /**
-     * Simply returns the row stride of this bitmap. <br>
-     * (Row stride means the amount of bytes per line.)
-     * 
-     * @return The row stride of this bitmap.
-     */
-    public int getRowStride()
-    {
-        return rowStride;
-    }
-
-    public Rectangle getBounds()
-    {
-        return new Rectangle(0, 0, width, height);
-    }
-
-    /**
-     * Returns the length of the underlying byte array.
-     * 
-     * @return byte array length
-     * 
-     * @deprecated renamed, will be removed in a future release. Use {@link Bitmap#getLength()} instead.
-     */
-    public int getMemorySize()
-    {
-        return getLength();
-    }
-
-    /**
-     * Returns the length of the underlying byte array.
-     * 
-     * @return byte array length
-     */
-    public int getLength()
-    {
-        return bitmap.length;
-    }
-
-    /**
-     * Fill the underlying bitmap with the given byte value.
-     * 
-     * @param fillByte the value to be stored in all elements of the bitmap
-     */
-    public void fillBitmap(byte fillByte)
-    {
-        Arrays.fill(bitmap, fillByte);
-    }
+    
     
     @Override
     public boolean equals(Object obj)
@@ -248,18 +256,22 @@ public class Bitmap
         Bitmap other = (Bitmap)obj;
         return Arrays.equals(bitmap, other.bitmap);
     }
+
+    
+    @Override
+    public Bitmap clone()
+    {
+        return new Bitmap(this);
+    }
+    
     
     /**
-     * Copy parts of the underlying array of a Bitmap to another Bitmap.
-     * 
-     * @param src the source Bitmap
-     * @param srcPos start position within the source Bitmap
-     * @param dest the destination Bitmap
-     * @param destPos start position within the destination Bitmap
-     * @param length the number of bytes to be copied
+     * Computes the bit offset of the given x coordinate in its byte.
+     * Returns {@code 7 - (x % 8)} since pixels start with the MSB first.
      */
-    public static void arraycopy(Bitmap src, int srcPos, Bitmap dest, int destPos,  int length)
+    private static int getBitOffset(int x)
     {
-        System.arraycopy(src.bitmap, srcPos, dest.bitmap, destPos, length);
+        return (x ^ 7) & 7;
     }
+    
 }
