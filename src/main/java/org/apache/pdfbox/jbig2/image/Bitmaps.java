@@ -56,13 +56,8 @@ public class Bitmaps
      */
     public static WritableRaster asRaster(final Bitmap bitmap, final FilterType filterType)
     {
-        if (bitmap == null)
-            throw new IllegalArgumentException("bitmap must not be null");
-
-        final JBIG2ReadParam param = new JBIG2ReadParam(1, 1, 0, 0,
-                new Rectangle(0, 0, bitmap.getWidth(), bitmap.getHeight()),
-                new Dimension(bitmap.getWidth(), bitmap.getHeight()));
-
+        if (bitmap == null) throw new IllegalArgumentException("bitmap must not be null");
+        final JBIG2ReadParam param = new JBIG2ReadParam(1, 1, 0, 0, bitmap.getBounds(), bitmap.getDimensions());
         return asRaster(bitmap, param, filterType);
     }
 
@@ -77,11 +72,8 @@ public class Bitmaps
     public static WritableRaster asRaster(Bitmap bitmap, final ImageReadParam param,
             final FilterType filterType)
     {
-        if (bitmap == null)
-            throw new IllegalArgumentException("bitmap must not be null");
-
-        if (param == null)
-            throw new IllegalArgumentException("param must not be null");
+        if (bitmap == null) throw new IllegalArgumentException("bitmap must not be null");
+        if (param == null) throw new IllegalArgumentException("param must not be null");
 
         final Dimension sourceRenderSize = param.getSourceRenderSize();
 
@@ -100,9 +92,6 @@ public class Bitmaps
         Rectangle sourceRegion = param.getSourceRegion();
         if (sourceRegion != null && !bitmap.getBounds().equals(sourceRegion))
         {
-            // make sure we don't request an area outside of the source bitmap
-            sourceRegion = bitmap.getBounds().intersection(sourceRegion);
-
             // get region of interest
             bitmap = Bitmaps.extract(sourceRegion, bitmap);
         }
@@ -173,43 +162,26 @@ public class Bitmaps
     {
         final int height = bitmap.getHeight();
         final int width = bitmap.getWidth();
-        final WritableRaster raster;
         
-        if (scaleX != 1 || scaleY != 1)
-        {
-            // scaling required
-            final Rectangle bounds = new Rectangle(0, 0, //
-                    (int) Math.round(width * scaleX), //
-                    (int) Math.round(height * scaleY));
-
-            raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
-                    bounds.width, bounds.height, 1, new Point());
-
-            final Resizer resizer = new Resizer(scaleX, scaleY);
-            final Filter filter = Filter.byType(filterType);
-            resizer.resize(bitmap, bitmap.getBounds() /* sourceRegion */, raster, bounds, filter,
-                    filter);
-        }
-        else
+        if (scaleX == 1 && scaleY == 1)
         {
             // scaling not required: clone and invert bitmap into packed raster
-            // extra care is taken to ensure padding bits are set to zero
-            final int bytes = width / 8;
-            final int bits = (~0xff >> (width & 7)) & 0xff;
-            final byte[] src = bitmap.bitmap;
-            final byte[] dst = new byte[height * bitmap.getRowStride()];
-            if ( bits==0 ) {
-                for ( int idx = 0, row = height; row>0; row-- ) {
-                    for ( int count = bytes; count>0; count-- ) dst[idx] = (byte)~src[idx++];
-                }
-            } else {
-                for ( int idx = 0, row = height; row>0; row-- ) {
-                    for ( int count = bytes; count>0; count-- ) dst[idx] = (byte)~src[idx++];
-                    dst[idx] = (byte)(~src[idx++] & bits);
-                }
-            }
-            raster = Raster.createPackedRaster(new DataBufferByte(dst, dst.length), width, height, 1, new Point());
+            // either empty new bitmap with XNOR or filled new bitmap with XOR, or just NOT
+            Bitmap result = new Bitmap(width, height);
+            blit(bitmap, result, 0, 0, CombinationOperator.NOT);
+            DataBufferByte buffer = new DataBufferByte(result.bitmap, result.bitmap.length);
+            return Raster.createPackedRaster(buffer, width, height, 1, new Point());
         }
+
+        final Rectangle bounds = new Rectangle(0, 0,
+            (int) Math.round(width * scaleX),(int) Math.round(height * scaleY));
+
+        final WritableRaster raster = Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
+            bounds.width, bounds.height, 1, new Point());
+
+        final Resizer resizer = new Resizer(scaleX, scaleY);
+        final Filter filter = Filter.byType(filterType);
+        resizer.resize(bitmap, bitmap.getBounds() /* sourceRegion */, raster, bounds, filter, filter);
         return raster;
     }
 
@@ -233,13 +205,8 @@ public class Bitmaps
      */
     public static BufferedImage asBufferedImage(Bitmap bitmap, FilterType filterType)
     {
-        if (bitmap == null)
-            throw new IllegalArgumentException("bitmap must not be null");
-
-        final JBIG2ReadParam param = new JBIG2ReadParam(1, 1, 0, 0,
-                new Rectangle(0, 0, bitmap.getWidth(), bitmap.getHeight()),
-                new Dimension(bitmap.getWidth(), bitmap.getHeight()));
-
+        if (bitmap == null) throw new IllegalArgumentException("bitmap must not be null");
+        final JBIG2ReadParam param = new JBIG2ReadParam(1, 1, 0, 0, bitmap.getBounds(), bitmap.getDimensions());
         return asBufferedImage(bitmap, param, filterType);
     }
 
@@ -254,11 +221,8 @@ public class Bitmaps
     public static BufferedImage asBufferedImage(Bitmap bitmap, ImageReadParam param,
             FilterType filterType)
     {
-        if (bitmap == null)
-            throw new IllegalArgumentException("bitmap must not be null");
-
-        if (param == null)
-            throw new IllegalArgumentException("param must not be null");
+        if (bitmap == null) throw new IllegalArgumentException("bitmap must not be null");
+        if (param == null) throw new IllegalArgumentException("param must not be null");
 
         final WritableRaster raster = asRaster(bitmap, param, filterType);
 
@@ -280,15 +244,9 @@ public class Bitmaps
         final boolean isScaled = scaleX != 1 || scaleY != 1;
         if (isScaled)
         {
-            final int size = 256;
-            final int divisor = size - 1;
-
-            final byte[] gray = new byte[size];
-            for (int i = size - 1, s = 0; i >= 0; i--, s++)
-            {
-                gray[i] = (byte) (255 - s * 255 / divisor);
-            }
-            cm = new IndexColorModel(8, size, gray, gray, gray);
+            final byte[] gray = new byte[256];
+            for (int i = 0; i < 256; i++ ) gray[i] = (byte)i;
+            cm = new IndexColorModel(8, 256, gray, gray, gray);
         }
         else
         {
@@ -307,112 +265,28 @@ public class Bitmaps
      * @param src the given bitmap
      * @return A {@code Bitmap} that represents the requested image section.
      */
-    public static Bitmap extract(final Rectangle roi, final Bitmap src)
+    public static Bitmap extract(Rectangle roi, final Bitmap src)
     {
-        final Bitmap dst = new Bitmap(roi.width, roi.height);
+        roi = roi.intersection(src.getBounds());
 
-        final int upShift = roi.x & 0x07;
-        final int downShift = 8 - upShift;
-        int dstLineStartIdx = 0;
-
-        final int padding = (8 - dst.getWidth() & 0x07);
-        int srcLineStartIdx = src.getByteIndex(roi.x, roi.y);
-        int srcLineEndIdx = src.getByteIndex(roi.x + roi.width - 1, roi.y);
-        final boolean usePadding = dst.getRowStride() == srcLineEndIdx + 1 - srcLineStartIdx;
-
-        for (int y = roi.y; y < roi.getMaxY(); y++)
-        {
-            int srcIdx = srcLineStartIdx;
-            int dstIdx = dstLineStartIdx;
-
-            if (srcLineStartIdx == srcLineEndIdx)
-            {
-                final byte pixels = (byte) (src.getByte(srcIdx) << upShift);
-                dst.setByte(dstIdx, unpad(padding, pixels));
-            }
-            else if (upShift == 0)
-            {
-                for (int x = srcLineStartIdx; x <= srcLineEndIdx; x++)
-                {
-                    byte value = src.getByte(srcIdx++);
-
-                    if (x == srcLineEndIdx && usePadding)
-                    {
-                        value = unpad(padding, value);
-                    }
-
-                    dst.setByte(dstIdx++, value);
-                }
-            }
-            else
-            {
-                copyLine(src, dst, upShift, downShift, padding, srcLineStartIdx, srcLineEndIdx,
-                        usePadding, srcIdx, dstIdx);
-            }
-
-            srcLineStartIdx += src.getRowStride();
-            srcLineEndIdx += src.getRowStride();
-            dstLineStartIdx += dst.getRowStride();
+        if ( roi.width<0 || roi.height<0 ) {
+            throw new IllegalArgumentException("ROI outside src");
         }
-
+        
+        if ( roi.width==0 || roi.height==0 ) {
+            return new Bitmap(0, 0);
+        }
+        
+        Bitmap dst = new Bitmap(roi.width, roi.height);
+        blit(src, roi, dst, null, 0, 0, CombinationOperator.REPLACE);
         return dst;
     }
 
-    private static void copyLine(Bitmap src, Bitmap dst, int sourceUpShift, int sourceDownShift,
-            int padding, int firstSourceByteOfLine, int lastSourceByteOfLine, boolean usePadding,
-            int sourceOffset, int targetOffset)
-    {
-        for (int x = firstSourceByteOfLine; x < lastSourceByteOfLine; x++)
-        {
-
-            if (sourceOffset + 1 < src.getLength())
-            {
-                final boolean isLastByte = x + 1 == lastSourceByteOfLine;
-                byte value = (byte) (src.getByte(sourceOffset++) << sourceUpShift
-                        | (src.getByte(sourceOffset) & 0xff) >>> sourceDownShift);
-
-                if (isLastByte && !usePadding)
-                {
-                    value = unpad(padding, value);
-                }
-
-                dst.setByte(targetOffset++, value);
-
-                if (isLastByte && usePadding)
-                {
-                    value = unpad(padding,
-                            (byte) ((src.getByte(sourceOffset) & 0xff) << sourceUpShift));
-                    dst.setByte(targetOffset, value);
-                }
-
-            }
-            else
-            {
-                final byte value = (byte) (src.getByte(sourceOffset++) << sourceUpShift & 0xff);
-                dst.setByte(targetOffset++, value);
-            }
-        }
-    }
-
-    /**
-     * Removes unnecessary bits from a byte.
-     * 
-     * @param padding - The amount of unnecessary bits.
-     * @param value - The byte that should be cleaned up.
-     * @return A cleaned byte.
-     */
-    private static byte unpad(int padding, byte value)
-    {
-        return (byte) (value >> padding << padding);
-    }
 
     public static Bitmap subsample(Bitmap src, ImageReadParam param)
     {
-        if (src == null)
-            throw new IllegalArgumentException("src must not be null");
-
-        if (param == null)
-            throw new IllegalArgumentException("param must not be null");
+        if (src == null) throw new IllegalArgumentException("src must not be null");
+        if (param == null) throw new IllegalArgumentException("param must not be null");
 
         final int xSubsampling = param.getSourceXSubsampling();
         final int ySubsampling = param.getSourceYSubsampling();
@@ -431,19 +305,16 @@ public class Bitmaps
                     .getWidth(); xDst++, xSrc += xSubsampling)
             {
                 final byte pixel = src.getPixel(xSrc, ySrc);
-                if (pixel != 0)
-                    dst.setPixel(xDst, yDst, pixel);
+                if (pixel != 0) dst.setPixel(xDst, yDst);
             }
         }
 
         return dst;
     }
 
-    public static Bitmap subsampleX(Bitmap src, final int xSubsampling,
-            final int xSubsamplingOffset)
+    public static Bitmap subsampleX(Bitmap src, final int xSubsampling, final int xSubsamplingOffset)
     {
-        if (src == null)
-            throw new IllegalArgumentException("src must not be null");
+        if (src == null) throw new IllegalArgumentException("src must not be null");
 
         final int dstHeight = (src.getWidth() - xSubsamplingOffset) / xSubsampling;
         final Bitmap dst = new Bitmap(src.getWidth(), dstHeight);
@@ -454,19 +325,16 @@ public class Bitmaps
                     .getWidth(); xDst++, xSrc += xSubsampling)
             {
                 final byte pixel = src.getPixel(xSrc, yDst);
-                if (pixel != 0)
-                    dst.setPixel(xDst, yDst, pixel);
+                if (pixel != 0) dst.setPixel(xDst, yDst);
             }
         }
 
         return dst;
     }
 
-    public static Bitmap subsampleY(Bitmap src, final int ySubsampling,
-            final int ySubsamplingOffset)
+    public static Bitmap subsampleY(Bitmap src, final int ySubsampling, final int ySubsamplingOffset)
     {
-        if (src == null)
-            throw new IllegalArgumentException("src must not be null");
+        if (src == null) throw new IllegalArgumentException("src must not be null");
 
         final int dstWidth = (src.getWidth() - ySubsamplingOffset) / ySubsampling;
         final Bitmap dst = new Bitmap(dstWidth, src.getHeight());
@@ -477,84 +345,28 @@ public class Bitmaps
             for (int xDst = 0; xDst < dst.getWidth(); xDst++)
             {
                 final byte pixel = src.getPixel(xDst, ySrc);
-                if (pixel != 0)
-                    dst.setPixel(xDst, yDst, pixel);
+                if (pixel != 0) dst.setPixel(xDst, yDst);
             }
         }
 
         return dst;
     }
 
-    /**
-     * The method combines two given bytes with an logical operator.
-     * <p>
-     * The JBIG2 Standard specifies 5 possible combinations of bytes.<br>
-     * <p>
-     * <b>Hint:</b> Please take a look at ISO/IEC 14492:2001 (E) for detailed definition and description of the
-     * operators.
-     * 
-     * @param value1 - The value that should be combined with value2.
-     * @param value2 - The value that should be combined with value1.
-     * @param op - The specified combination operator.
-     * 
-     * @return The combination result.
-     */
-    public static byte combineBytes(byte value1, byte value2, CombinationOperator op)
+    
+    public static void fill(Bitmap bitmap, int pixel)
     {
-
-        switch (op)
-        {
-        case OR:
-            return (byte) (value2 | value1);
-        case AND:
-            return (byte) (value2 & value1);
-        case XOR:
-            return (byte) (value2 ^ value1);
-        case XNOR:
-            return (byte) ~(value1 ^ value2);
-        case REPLACE:
-        default:
-            // Old value is replaced by new value.
-            return value2;
-        }
+        Blitter.fill(bitmap.bitmap, bitmap.getWidth(), bitmap.getHeight(), bitmap.getRowStride(), pixel);
     }
 
     
-    /**
-     * The method combines two given bytes arrays with an logical operator.
-     * <p>
-     * The JBIG2 Standard specifies 5 possible combinations of bytes.<br>
-     * <p>
-     * <b>Hint:</b> Please take a look at ISO/IEC 14492:2001 (E) for detailed definition and description of the
-     * operators.
-     * 
-     * @param op - The specified combination operator.
-     */
-    public static void combineBytes(byte[] src, int srcPos, byte[] dst, int dstPos, int length, CombinationOperator op)
+    
+    
+    public static void combineBitmaps(Bitmap src, Bitmap dst, CombinationOperator operator)
     {
-        switch (op) {
-            case OR:
-                while ( length-->0 ) dst[dstPos++] |= src[srcPos++];
-                break;
-                
-            case AND:
-                while ( length-->0 ) dst[dstPos++] &= src[srcPos++];
-                break;
-                
-            case XOR:
-                while ( length-->0 ) dst[dstPos++] ^= src[srcPos++];
-                break;
-                
-            case XNOR:
-                while ( length-->0 ) dst[dstPos] = (byte)~(dst[dstPos++] ^ src[srcPos++]);
-                break;
-                
-            case REPLACE:
-            default:
-                System.arraycopy(src, srcPos, dst, dstPos, length);
-        }
+        blit(src, dst, 0, 0, operator);
     }
-
+    
+    
     /**
      * This method combines a given bitmap with the current instance.
      * <p>
@@ -564,145 +376,23 @@ public class Bitmaps
      * @param dst - The destination bitmap.
      * @param x - The x coordinate where the upper left corner of the bitmap to blit should be positioned.
      * @param y - The y coordinate where the upper left corner of the bitmap to blit should be positioned.
-     * @param combinationOperator - The combination operator for combining two pixels.
+     * @param operator - The combination operator for combining two pixels.
      */
-    public static void blit(Bitmap src, Bitmap dst, int x, int y,
-            CombinationOperator combinationOperator)
+    public static void blit(Bitmap src, Bitmap dst, int x, int y, CombinationOperator operator)
     {
-
-        int startLine = 0;
-        int srcStartIdx = 0;
-        int srcEndIdx = (src.getRowStride() - 1);
-
-        // Ignore those parts of the source bitmap which would be placed outside the target bitmap.
-        if (x < 0)
-        {
-            srcStartIdx = -x;
-            x = 0;
-        }
-        else if (x + src.getWidth() > dst.getWidth())
-        {
-            srcEndIdx -= (src.getWidth() + x - dst.getWidth());
-        }
-
-        if (y < 0)
-        {
-            startLine = -y;
-            y = 0;
-            srcStartIdx += src.getRowStride();
-            srcEndIdx += src.getRowStride();
-        }
-        else if (y + src.getHeight() > dst.getHeight())
-        {
-            startLine = src.getHeight() + y - dst.getHeight();
-        }
-
-        final int shiftVal1 = x & 0x07;
-        final int shiftVal2 = 8 - shiftVal1;
-
-        final int padding = src.getWidth() & 0x07;
-        final int toShift = shiftVal2 - padding;
-
-        final boolean useShift = (shiftVal2 & 0x07) != 0;
-        final boolean specialCase = src.getWidth() <= ((srcEndIdx - srcStartIdx) << 3) + shiftVal2;
-
-        final int dstStartIdx = dst.getByteIndex(x, y);
-
-        final int lastLine = Math.min(src.getHeight(), startLine + dst.getHeight());
-
-        if (!useShift)
-        {
-            blitUnshifted(src, dst, startLine, lastLine, dstStartIdx, srcStartIdx, srcEndIdx,
-                    combinationOperator);
-        }
-        else if (specialCase)
-        {
-            blitSpecialShifted(src, dst, startLine, lastLine, dstStartIdx, srcStartIdx, srcEndIdx,
-                    toShift, shiftVal1, shiftVal2, combinationOperator);
-        }
-        else
-        {
-            blitShifted(src, dst, startLine, lastLine, dstStartIdx, srcStartIdx, srcEndIdx, toShift,
-                    shiftVal1, shiftVal2, combinationOperator, padding);
-        }
+        Blitter.blit(
+            src.bitmap, src.getWidth(), src.getHeight(), src.getRowStride(), null,
+            dst.bitmap, dst.getWidth(), dst.getHeight(), dst.getRowStride(), null,
+            x, y, operator);
     }
-
-    private static void blitUnshifted(Bitmap src, Bitmap dst, int startLine, int lastLine,
-            int dstStartIdx, int srcStartIdx, int srcEndIdx, CombinationOperator op)
+    
+    
+    public static void blit(Bitmap src, Rectangle srcRegion, Bitmap dst, Rectangle dstRegion, int x, int y, CombinationOperator operator)
     {
-        final int length = srcEndIdx - srcStartIdx + 1; // srcEndIdx is inclusive
-        for ( int count = lastLine - startLine; count>0; count-- ) {
-            combineBytes(src.bitmap, srcStartIdx, dst.bitmap, dstStartIdx, length, op);
-            srcStartIdx += src.getRowStride();
-            dstStartIdx += dst.getRowStride();
-        }
-    }
-
-    private static void blitSpecialShifted(Bitmap src, Bitmap dst, int startLine, int lastLine,
-            int dstStartIdx, int srcStartIdx, int srcEndIdx, int toShift, int shiftVal1,
-            int shiftVal2, CombinationOperator op)
-    {
-
-        for (int dstLine = startLine; dstLine < lastLine; dstLine++, dstStartIdx += dst
-                .getRowStride(), srcStartIdx += src.getRowStride(), srcEndIdx += src.getRowStride())
-        {
-            short register = 0;
-            int dstIdx = dstStartIdx;
-
-            // Go through the bytes in a line of the Symbol
-            for (int srcIdx = srcStartIdx; srcIdx <= srcEndIdx; srcIdx++)
-            {
-                byte oldByte = dst.getByte(dstIdx);
-                register = (short) ((register | src.getByte(srcIdx) & 0xff) << shiftVal2);
-                byte newByte = (byte) (register >> 8);
-
-                if (srcIdx == srcEndIdx)
-                {
-                    newByte = unpad(toShift, newByte);
-                }
-
-                dst.setByte(dstIdx++, Bitmaps.combineBytes(oldByte, newByte, op));
-                register <<= shiftVal1;
-            }
-        }
-    }
-
-    private static void blitShifted(Bitmap src, Bitmap dst, int startLine, int lastLine,
-            int dstStartIdx, int srcStartIdx, int srcEndIdx, int toShift, int shiftVal1,
-            int shiftVal2, CombinationOperator op, int padding)
-    {
-
-        for (int dstLine = startLine; dstLine < lastLine; dstLine++, dstStartIdx += dst
-                .getRowStride(), srcStartIdx += src.getRowStride(), srcEndIdx += src.getRowStride())
-        {
-            short register = 0;
-            int dstIdx = dstStartIdx;
-
-            // Go through the bytes in a line of the symbol
-            for (int srcIdx = srcStartIdx; srcIdx <= srcEndIdx; srcIdx++)
-            {
-                byte oldByte = dst.getByte(dstIdx);
-                register = (short) ((register | src.getByte(srcIdx) & 0xff) << shiftVal2);
-
-                byte newByte = (byte) (register >> 8);
-                dst.setByte(dstIdx++, Bitmaps.combineBytes(oldByte, newByte, op));
-
-                register <<= shiftVal1;
-
-                if (srcIdx == srcEndIdx)
-                {
-                    newByte = (byte) (register >> (8 - shiftVal2));
-
-                    if (padding != 0)
-                    {
-                        newByte = unpad(8 + toShift, newByte);
-                    }
-
-                    oldByte = dst.getByte(dstIdx);
-                    dst.setByte(dstIdx, Bitmaps.combineBytes(oldByte, newByte, op));
-                }
-            }
-        }
+        Blitter.blit(
+            src.bitmap, src.getWidth(), src.getHeight(), src.getRowStride(), srcRegion,
+            dst.bitmap, dst.getWidth(), dst.getHeight(), dst.getRowStride(), dstRegion,
+            x, y, operator);
     }
 
 }

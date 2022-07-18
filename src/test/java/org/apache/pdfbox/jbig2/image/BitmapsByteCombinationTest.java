@@ -31,9 +31,8 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class BitmapsByteCombinationTest
 {
-
-    private static final byte value1 = 0xA;
-    private static final byte value2 = 0xD;
+    private static final byte SRC = 0xD;
+    private static final byte DST = 0xA;
 
     private final int expected;
     private final CombinationOperator operator;
@@ -41,9 +40,13 @@ public class BitmapsByteCombinationTest
     @Parameters
     public static Collection<Object[]> data()
     {
-        return Arrays.asList(new Object[][] { { 0xF, CombinationOperator.OR },
-                { 0x8, CombinationOperator.AND }, { 0x7, CombinationOperator.XOR },
-                { -8, CombinationOperator.XNOR }, { value2, CombinationOperator.REPLACE } });
+        return Arrays.asList(new Object[][] {
+            { 0xF, CombinationOperator.OR },
+            { 0x8, CombinationOperator.AND },
+            { 0x7, CombinationOperator.XOR },
+            { -8, CombinationOperator.XNOR },
+            { SRC, CombinationOperator.REPLACE }
+        });
     }
 
     public BitmapsByteCombinationTest(final int expected, final CombinationOperator operator)
@@ -55,7 +58,9 @@ public class BitmapsByteCombinationTest
     @Test
     public void test()
     {
-        assertEquals(expected, Bitmaps.combineBytes(value1, value2, operator));
+        byte[] src = { SRC }, dst = { DST };
+        Blitter.blit(src, 8, 1, 1, null, dst, 8, 1, 1, null, 0, 0, operator);
+        assertEquals(expected, dst[0]);
     }
 
 }

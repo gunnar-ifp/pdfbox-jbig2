@@ -290,19 +290,7 @@ public class HalftoneRegion implements Region
 
     private Bitmap[] combineGrayScalePlanes(Bitmap[] grayScalePlanes, int j)
     {
-        int byteIndex = 0;
-        for (int y = 0; y < grayScalePlanes[j].getHeight(); y++)
-        {
-
-            for (int x = 0; x < grayScalePlanes[j].getWidth(); x += 8)
-            {
-                final byte newValue = grayScalePlanes[j + 1].getByte(byteIndex);
-                final byte oldValue = grayScalePlanes[j].getByte(byteIndex);
-
-                grayScalePlanes[j].setByte(byteIndex++,
-                        Bitmaps.combineBytes(oldValue, newValue, CombinationOperator.XOR));
-            }
-        }
+        Bitmaps.blit(grayScalePlanes[j + 1], grayScalePlanes[j], 0, 0, CombinationOperator.XOR);
         return grayScalePlanes;
     }
 
