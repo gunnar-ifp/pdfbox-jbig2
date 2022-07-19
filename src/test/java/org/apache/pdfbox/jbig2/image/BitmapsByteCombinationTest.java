@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.pdfbox.jbig2.util.CombinationOperator;
+import org.apache.pdfbox.jbig2.image.Blitter.BitCombinationOperator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,21 +35,22 @@ public class BitmapsByteCombinationTest
     private static final byte DST = 0xA;
 
     private final int expected;
-    private final CombinationOperator operator;
+    private final BitCombinationOperator operator;
 
     @Parameters
     public static Collection<Object[]> data()
     {
         return Arrays.asList(new Object[][] {
-            { 0xF, CombinationOperator.OR },
-            { 0x8, CombinationOperator.AND },
-            { 0x7, CombinationOperator.XOR },
-            { -8, CombinationOperator.XNOR },
-            { SRC, CombinationOperator.REPLACE }
+            { 0xF,  BitCombinationOperator.OR },
+            { 0x8,  BitCombinationOperator.AND },
+            { 0x7,  BitCombinationOperator.XOR },
+            { -8,   BitCombinationOperator.XNOR },
+            { SRC,  BitCombinationOperator.REPLACE },
+            { ~SRC, BitCombinationOperator.NOT }
         });
     }
 
-    public BitmapsByteCombinationTest(final int expected, final CombinationOperator operator)
+    public BitmapsByteCombinationTest(final int expected, final BitCombinationOperator operator)
     {
         this.expected = expected;
         this.operator = operator;

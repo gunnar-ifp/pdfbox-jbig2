@@ -70,7 +70,7 @@ public final class Bitmap implements Cloneable
         this(width, height);
         if ( defaultPixelValue!=0 ) {
             // emulate old behvaiour with padding pixels until side effects are known.
-            //Bitmaps.fill(this, defaultPixelValue);
+            //Blitter.fill(bitmap, width, height, rowStride, defaultPixelValue);
             Blitter.fill(bitmap, rowStride * 8, height, rowStride, defaultPixelValue);
         }
     }

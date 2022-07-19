@@ -31,6 +31,7 @@ import java.awt.image.WritableRaster;
 import javax.imageio.ImageReadParam;
 
 import org.apache.pdfbox.jbig2.JBIG2ReadParam;
+import org.apache.pdfbox.jbig2.image.Blitter.BitCombinationOperator;
 import org.apache.pdfbox.jbig2.util.CombinationOperator;
 
 public class Bitmaps
@@ -168,7 +169,7 @@ public class Bitmaps
             // scaling not required: clone and invert bitmap into packed raster
             // either empty new bitmap with XNOR or filled new bitmap with XOR, or just NOT
             Bitmap result = new Bitmap(width, height);
-            blit(bitmap, result, 0, 0, CombinationOperator.NOT);
+            blit(bitmap, result, 0, 0, BitCombinationOperator.NOT);
             DataBufferByte buffer = new DataBufferByte(result.bitmap, result.bitmap.length);
             return Raster.createPackedRaster(buffer, width, height, 1, new Point());
         }
@@ -383,16 +384,38 @@ public class Bitmaps
         Blitter.blit(
             src.bitmap, src.getWidth(), src.getHeight(), src.getRowStride(), null,
             dst.bitmap, dst.getWidth(), dst.getHeight(), dst.getRowStride(), null,
-            x, y, operator);
+            x, y, toBlitterOp(operator));
     }
     
+    
+    private static void blit(Bitmap src, Bitmap dst, int x, int y, BitCombinationOperator operator)
+    {
+        Blitter.blit(
+            src.bitmap, src.getWidth(), src.getHeight(), src.getRowStride(), null,
+            dst.bitmap, dst.getWidth(), dst.getHeight(), dst.getRowStride(), null,
+            x, y, operator);
+    }
+
     
     public static void blit(Bitmap src, Rectangle srcRegion, Bitmap dst, Rectangle dstRegion, int x, int y, CombinationOperator operator)
     {
         Blitter.blit(
             src.bitmap, src.getWidth(), src.getHeight(), src.getRowStride(), srcRegion,
             dst.bitmap, dst.getWidth(), dst.getHeight(), dst.getRowStride(), dstRegion,
-            x, y, operator);
+            x, y, toBlitterOp(operator));
+    }
+    
+    
+    private static BitCombinationOperator toBlitterOp(CombinationOperator operator)
+    {
+        switch (operator) {
+            case OR:   return BitCombinationOperator.OR;
+            case AND:  return BitCombinationOperator.AND;
+            case XOR:  return BitCombinationOperator.XOR;
+            case XNOR: return BitCombinationOperator.XNOR;
+            case REPLACE: 
+            default:   return BitCombinationOperator.REPLACE;
+        }
     }
 
 }

@@ -20,7 +20,6 @@ package org.apache.pdfbox.jbig2.image;
 import java.awt.Rectangle;
 import java.util.Arrays;
 
-import org.apache.pdfbox.jbig2.util.CombinationOperator;
 
 /**
  * Binary image blitter with full support for partially overlapping source
@@ -31,8 +30,20 @@ import org.apache.pdfbox.jbig2.util.CombinationOperator;
  * @author <a href="mailto:gunnar.brand@interface-projects.de">Gunnar Brand</a>
  * @since 14.07.2022
  */
-final class Blitter
+public final class Blitter
 {
+    /**
+     * Bit combination operator.
+     * <p>
+     * This class is a stand-alone class, so it has it's own
+     * operator enum, which is intentionally kept compatible
+     * to the JBIG 2 codes and CombinationOperator.
+     */
+    public enum BitCombinationOperator {
+        OR, AND, XOR, XNOR, REPLACE, NOT;
+    }
+    
+    
     private Blitter()
     {
     }
@@ -57,7 +68,7 @@ final class Blitter
     public static void blit(
         byte[] src, int srcWidth, int srcHeight, int srcRowStride, Rectangle srcRegion,
         byte[] dst, int dstWidth, int dstHeight, int dstRowStride, Rectangle dstRegion,
-        int dstX, int dstY, CombinationOperator operator)
+        int dstX, int dstY, BitCombinationOperator operator)
     {
         // coordinate normalization:
         // 1) adjust source rectangle with source region (optional)
