@@ -410,7 +410,7 @@ public class GenericRefinementRegion implements Region
                 index = tval;
             }
             final int bit = arithDecoder.decode(cx, index);
-            regionBitmap.setPixel(x, lineNumber, (byte) bit);
+            if ( bit!=0 ) regionBitmap.setPixel(x, lineNumber);
 
             c1 = (short) (((c1 << 1) | 0x01 & (w1 >>> 7)) & 0x07);
             c2 = (short) (((c2 << 1) | 0x01 & (w2 >>> 7)) & 0x07);
