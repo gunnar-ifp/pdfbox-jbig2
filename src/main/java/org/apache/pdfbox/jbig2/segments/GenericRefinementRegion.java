@@ -813,7 +813,7 @@ public class GenericRefinementRegion implements Region
     }
 
     private int overrideAtTemplate0(int context, final int x, final int y, final int result,
-            final int minorX) throws IOException
+            final int minorX)
     {
         if (grAtOverride[0])
         {
