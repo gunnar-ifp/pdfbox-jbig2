@@ -896,13 +896,7 @@ public class GenericRegion implements Region
 
     private byte getPixel(final int x, final int y) throws IOException
     {
-        if (x < 0 || x >= regionBitmap.getWidth())
-            return 0;
-
-        if (y < 0 || y >= regionBitmap.getHeight())
-            return 0;
-
-        return regionBitmap.getPixel(x, y);
+        return regionBitmap.getSafePixel(x, y);
     }
 
     /**

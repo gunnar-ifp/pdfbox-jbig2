@@ -568,25 +568,12 @@ public class MMRDecompressor
         byte targetByteValue = 0;
         for (int index = 0; index < count; index++)
         {
-
             final int offset = currentOffsets[index];
-            byte value;
-
-            if ((index & 1) == 0)
-            {
-                value = 0;
-            }
-            else
-            {
-                value = 1;
-            }
-
+            final int value = (byte)(index & 1);
             while (x < offset)
             {
                 targetByteValue = (byte) ((targetByteValue << 1) | value);
-                x++;
-
-                if ((x & 7) == 0)
+                if ((++x & 7) == 0)
                 {
                     result.setByte(targetByte++, targetByteValue);
                     targetByteValue = 0;

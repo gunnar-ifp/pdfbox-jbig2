@@ -824,7 +824,7 @@ public class GenericRefinementRegion implements Region
             }
             else
             {
-                context |= getPixel(regionBitmap, x + grAtX[0], y + grAtY[0]) << 3;
+                context |= regionBitmap.getSafePixel(x + grAtX[0], y + grAtY[0]) << 3;
             }
         }
 
@@ -837,25 +837,12 @@ public class GenericRefinementRegion implements Region
             }
             else
             {
-                context |= getPixel(referenceBitmap, x + grAtX[1] + referenceDX,
-                        y + grAtY[1] + referenceDY) << 12;
+                context |= referenceBitmap.getSafePixel(
+                    x + grAtX[1] + referenceDX,
+                    y + grAtY[1] + referenceDY) << 12;
             }
         }
         return context;
-    }
-
-    private byte getPixel(final Bitmap b, final int x, final int y) throws IOException
-    {
-        if (x < 0 || x >= b.getWidth())
-        {
-            return 0;
-        }
-        if (y < 0 || y >= b.getHeight())
-        {
-            return 0;
-        }
-
-        return b.getPixel(x, y);
     }
 
     @Override

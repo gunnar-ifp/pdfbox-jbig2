@@ -168,10 +168,27 @@ public final class Bitmap implements Cloneable
      */
     public byte getPixel(int x, int y)
     {
-        int byteIndex = getByteIndex(x, y);
-        return (byte) ((bitmap[byteIndex] >> getBitOffset(x)) & 1);
+        return (byte) ((bitmap[getByteIndex(x, y)] >> getBitOffset(x)) & 1);
     }
 
+    
+    /**
+     * Returns the value of a pixel specified by the given coordinates
+     * or 0 if the pixel is outside the bitmap.
+     * <p>
+     * By default, the value is {@code 0} for a white pixel and {@code 1} for a black pixel. The value is placed in the
+     * rightmost bit in the byte.
+     * 
+     * @param x - The x coordinate of the pixel.
+     * @param y - The y coordinate of the pixel.
+     * @return The value of a pixel.
+     */
+    public byte getSafePixel(int x, int y)
+    {
+        if ( x<0 || y<0 || x>=width || y>=height ) return 0;
+        return (byte) ((bitmap[getByteIndex(x, y)] >> getBitOffset(x)) & 1);
+    }
+    
     
     /**
      * Sets a pixel.
