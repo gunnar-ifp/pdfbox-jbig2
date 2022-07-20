@@ -26,6 +26,7 @@ import org.apache.pdfbox.jbig2.decoder.arithmetic.CX;
 import org.apache.pdfbox.jbig2.decoder.mmr.MMRDecompressor;
 import org.apache.pdfbox.jbig2.err.InvalidHeaderValueException;
 import org.apache.pdfbox.jbig2.image.Bitmap;
+import org.apache.pdfbox.jbig2.image.Bitmaps;
 import org.apache.pdfbox.jbig2.util.SubInputStream;
 
 /**
@@ -221,10 +222,9 @@ public class GenericRegion implements Region
                     /* 6.2.5.7 - 3 c) */
                     if (ltp == 1)
                     {
-                        if (line > 0)
-                        {
-                            copyLineAbove(line);
-                        }
+                        // Each pixel gets the value from the corresponding pixel of the row above.
+                        // Line 0 cannot get filled that way.
+                        Bitmaps.copyLine(regionBitmap, line - 1, line);
                     }
                     else
                     {
@@ -288,24 +288,6 @@ public class GenericRegion implements Region
         case 3:
             decodeTemplate3(lineNumber, width, rowStride, paddedWidth, byteIndex, idx);
             break;
-        }
-    }
-
-    /**
-     * Each pixel gets the value from the corresponding pixel of the row above. Line 0 cannot get copied values (source
-     * will be -1, doesn't exist).
-     * 
-     * @param lineNumber - Coordinate of the row that should be set.
-     */
-    private void copyLineAbove(final int lineNumber)
-    {
-        int targetByteIndex = lineNumber * regionBitmap.getRowStride();
-        int sourceByteIndex = targetByteIndex - regionBitmap.getRowStride();
-
-        for (int i = 0; i < regionBitmap.getRowStride(); i++)
-        {
-            // Get the byte that should be copied and put it into Bitmap
-            regionBitmap.setByte(targetByteIndex++, regionBitmap.getByte(sourceByteIndex++));
         }
     }
 

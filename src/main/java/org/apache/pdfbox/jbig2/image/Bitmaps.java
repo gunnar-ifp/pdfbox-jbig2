@@ -354,6 +354,14 @@ public class Bitmaps
     }
 
     
+    public static void copyLine(Bitmap bitmap, int srcY, int dstY)
+    {
+        if ( srcY<0 || dstY<0 || srcY==dstY || srcY>=bitmap.getHeight() || dstY>=bitmap.getHeight() ) return;
+        System.arraycopy(bitmap.bitmap, srcY * bitmap.getRowStride(),
+            bitmap.bitmap, dstY * bitmap.getRowStride(), bitmap.getRowStride());
+    }
+    
+    
     public static void fill(Bitmap bitmap, int pixel)
     {
         Blitter.fill(bitmap.bitmap, bitmap.getWidth(), bitmap.getHeight(), bitmap.getRowStride(), pixel);
