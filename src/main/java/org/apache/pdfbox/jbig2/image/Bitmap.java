@@ -210,57 +210,58 @@ public final class Bitmap implements Cloneable
      */
     public int getByteIndex(int x, int y)
     {
-        return y * this.rowStride + (x >> 3);
+        return y * rowStride + (x >> 3);
     }
 
     
     /**
-     * Simply returns a byte from the bitmap byte array. Throws an {@link IndexOutOfBoundsException} if the given index
-     * is out of bound.<br>
+     * Returns a byte sign extended to an integer from the bitmap byte array.
+     * Throws an {@link IndexOutOfBoundsException} if the given index is out of bound.<br>
      * Any pixels outside the bitmap due to the width not being a multiple of 8 will be returned, too.
      * 
      * @param index - The array index that specifies the position of the wanted byte.
-     * @return The byte at the {@code index}-position.
+     * @return The byte at the {@code index} position extended to an integer.
      * 
      * @throws IndexOutOfBoundsException if the index is out of bound.
      */
-    public byte getByte(int index)
+    public int getByte(int index)
     {
-        return this.bitmap[index];
+        return bitmap[index];
     }
 
+    
+    /**
+     * Returns a byte clamped {@code [0; 255]} from the bitmap byte array.
+     * Throws an {@link IndexOutOfBoundsException} if the given index is out of bound.<br>
+     * Any pixels outside the bitmap due to the width not being a multiple of 8 will be returned, too.
+     * 
+     * @param index - The array index that specifies the position of the wanted byte.
+     * @return The converted byte at the {@code index} position as an unsigned integer.
+     * 
+     * @throws IndexOutOfBoundsException if the index is out of bound.
+     */
+    public int getByteUnsigned(int index)
+    {
+        return bitmap[index] & 0xff;
+    }
+    
     
     /**
      * Simply sets the given value at the given array index position. Throws an {@link IndexOutOfBoundsException} if the
      * given index is out of bound.<br>
      * Any pixels outside the bitmap due to the width not being a multiple of 8 will be overwritten, too.
+     * Only the lower 8 bits of the value will be used.
      * 
      * @param index - The array index that specifies the position of a byte.
      * @param value - The byte that should be set.
      * 
      * @throws IndexOutOfBoundsException if the index is out of bound.
      */
-    public void setByte(int index, byte value)
+    public void setByte(int index, int value)
     {
-        this.bitmap[index] = value;
+        bitmap[index] = (byte)value;
     }
 
-    
-    /**
-     * Converts the byte at specified index into an integer and returns the value. Throws an
-     * {@link IndexOutOfBoundsException} if the given index is out of bound.<br>
-     * Any pixels outside the bitmap due to the width not being a multiple of 8 will be returned, too.
-     * 
-     * @param index - The array index that specifies the position of the wanted byte.
-     * @return The converted byte at the {@code index}-position as an integer.
-     * 
-     * @throws IndexOutOfBoundsException if the index is out of bound.
-     */
-    public int getByteAsInteger(int index)
-    {
-        return (this.bitmap[index] & 0xff);
-    }
-    
     
     @Override
     public boolean equals(Object obj)

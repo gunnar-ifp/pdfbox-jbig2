@@ -308,16 +308,16 @@ public class GenericRefinementRegion implements Region
         w1 = w2 = w3 = w4 = 0;
 
         if (currentLine >= 1 && (currentLine - 1) < referenceBitmap.getHeight())
-            w1 = referenceBitmap.getByteAsInteger(refByteIndex - refRowStride);
+            w1 = referenceBitmap.getByteUnsigned(refByteIndex - refRowStride);
         if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
-            w2 = referenceBitmap.getByteAsInteger(refByteIndex);
+            w2 = referenceBitmap.getByteUnsigned(refByteIndex);
         if (currentLine >= -1 && currentLine + 1 < referenceBitmap.getHeight())
-            w3 = referenceBitmap.getByteAsInteger(refByteIndex + refRowStride);
+            w3 = referenceBitmap.getByteUnsigned(refByteIndex + refRowStride);
         refByteIndex++;
 
         if (lineNumber >= 1)
         {
-            w4 = regionBitmap.getByteAsInteger(byteIndex - rowStride);
+            w4 = regionBitmap.getByteUnsigned(byteIndex - rowStride);
         }
         byteIndex++;
 
@@ -334,16 +334,16 @@ public class GenericRefinementRegion implements Region
             {
                 if (currentLine >= 1 && (currentLine - 1) < referenceBitmap.getHeight())
                 {
-                    c1 |= referenceBitmap.getByteAsInteger(refByteIndex - refRowStride - 2) << 2
+                    c1 |= referenceBitmap.getByteUnsigned(refByteIndex - refRowStride - 2) << 2
                             & 0x04;
                 }
                 if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
                 {
-                    c2 |= referenceBitmap.getByteAsInteger(refByteIndex - 2) << 2 & 0x04;
+                    c2 |= referenceBitmap.getByteUnsigned(refByteIndex - 2) << 2 & 0x04;
                 }
                 if (currentLine >= -1 && currentLine + 1 < referenceBitmap.getHeight())
                 {
-                    c3 |= referenceBitmap.getByteAsInteger(refByteIndex + refRowStride - 2) << 2
+                    c3 |= referenceBitmap.getByteUnsigned(refByteIndex + refRowStride - 2) << 2
                             & 0x04;
                 }
             }
@@ -353,11 +353,11 @@ public class GenericRefinementRegion implements Region
                 if (modRefByteIdx < refRowStride - 1)
                 {
                     if (currentLine >= 1 && (currentLine - 1) < referenceBitmap.getHeight())
-                        w1 = referenceBitmap.getByteAsInteger(refByteIndex - refRowStride);
+                        w1 = referenceBitmap.getByteUnsigned(refByteIndex - refRowStride);
                     if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
-                        w2 = referenceBitmap.getByteAsInteger(refByteIndex);
+                        w2 = referenceBitmap.getByteUnsigned(refByteIndex);
                     if (currentLine >= -1 && currentLine + 1 < referenceBitmap.getHeight())
-                        w3 = referenceBitmap.getByteAsInteger(refByteIndex + refRowStride);
+                        w3 = referenceBitmap.getByteUnsigned(refByteIndex + refRowStride);
                 }
                 refByteIndex++;
             }
@@ -371,11 +371,11 @@ public class GenericRefinementRegion implements Region
             if (modRefByteIdx < refRowStride - 1)
             {
                 if (currentLine >= 1 && (currentLine - 1) < referenceBitmap.getHeight())
-                    w1 = referenceBitmap.getByteAsInteger(refByteIndex - refRowStride);
+                    w1 = referenceBitmap.getByteUnsigned(refByteIndex - refRowStride);
                 if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
-                    w2 = referenceBitmap.getByteAsInteger(refByteIndex);
+                    w2 = referenceBitmap.getByteUnsigned(refByteIndex);
                 if (currentLine >= -1 && currentLine + 1 < referenceBitmap.getHeight())
-                    w3 = referenceBitmap.getByteAsInteger(refByteIndex + refRowStride);
+                    w3 = referenceBitmap.getByteUnsigned(refByteIndex + refRowStride);
                 refByteIndex++;
             }
             c1 |= (short) ((w1 >>> 7) & 0x07);
@@ -428,7 +428,7 @@ public class GenericRefinementRegion implements Region
                 {
                     if (currentLine >= 1 && (currentLine - 1 < referenceBitmap.getHeight()))
                     {
-                        w1 = referenceBitmap.getByteAsInteger(refByteIndex - refRowStride);
+                        w1 = referenceBitmap.getByteUnsigned(refByteIndex - refRowStride);
                     }
                     else
                     {
@@ -436,7 +436,7 @@ public class GenericRefinementRegion implements Region
                     }
                     if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
                     {
-                        w2 = referenceBitmap.getByteAsInteger(refByteIndex);
+                        w2 = referenceBitmap.getByteUnsigned(refByteIndex);
                     }
                     else
                     {
@@ -444,7 +444,7 @@ public class GenericRefinementRegion implements Region
                     }
                     if (currentLine >= -1 && (currentLine + 1) < referenceBitmap.getHeight())
                     {
-                        w3 = referenceBitmap.getByteAsInteger(refByteIndex + refRowStride);
+                        w3 = referenceBitmap.getByteUnsigned(refByteIndex + refRowStride);
                     }
                     else
                     {
@@ -468,7 +468,7 @@ public class GenericRefinementRegion implements Region
                 }
                 else
                 {
-                    w4 = regionBitmap.getByteAsInteger(byteIndex - rowStride);
+                    w4 = regionBitmap.getByteUnsigned(byteIndex - rowStride);
                 }
                 byteIndex++;
             }
@@ -555,7 +555,7 @@ public class GenericRefinementRegion implements Region
 
         if (lineNumber > 0)
         {
-            previousLine = regionBitmap.getByteAsInteger(byteIndex - rowStride);
+            previousLine = regionBitmap.getByteUnsigned(byteIndex - rowStride);
         }
         else
         {
@@ -565,7 +565,7 @@ public class GenericRefinementRegion implements Region
         if (currentLine > 0 && currentLine <= referenceBitmap.getHeight())
         {
             previousReferenceLine = referenceBitmap
-                    .getByteAsInteger(refByteIndex - refRowStride + deltaRefStride) << 4;
+                    .getByteUnsigned(refByteIndex - refRowStride + deltaRefStride) << 4;
         }
         else
         {
@@ -575,7 +575,7 @@ public class GenericRefinementRegion implements Region
         if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
         {
             currentReferenceLine = referenceBitmap
-                    .getByteAsInteger(refByteIndex + deltaRefStride) << 1;
+                    .getByteUnsigned(refByteIndex + deltaRefStride) << 1;
         }
         else
         {
@@ -585,7 +585,7 @@ public class GenericRefinementRegion implements Region
         if (currentLine > -2 && currentLine < (referenceBitmap.getHeight() - 1))
         {
             nextReferenceLine = referenceBitmap
-                    .getByteAsInteger(refByteIndex + refRowStride + deltaRefStride);
+                    .getByteUnsigned(refByteIndex + refRowStride + deltaRefStride);
         }
         else
         {
@@ -609,26 +609,26 @@ public class GenericRefinementRegion implements Region
             if (lineNumber > 0)
             {
                 previousLine = (previousLine << 8) | (readNextByte
-                        ? regionBitmap.getByteAsInteger(byteIndex - rowStride + 1) : 0);
+                        ? regionBitmap.getByteUnsigned(byteIndex - rowStride + 1) : 0);
             }
 
             if (currentLine > 0 && currentLine <= referenceBitmap.getHeight())
             {
                 previousReferenceLine = (previousReferenceLine << 8)
                         | (refReadNextByte ? referenceBitmap
-                                .getByteAsInteger(refByteIndex - refRowStride + yOffset) << 4 : 0);
+                                .getByteUnsigned(refByteIndex - refRowStride + yOffset) << 4 : 0);
             }
 
             if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
             {
                 currentReferenceLine = (currentReferenceLine << 8) | (refReadNextByte
-                        ? referenceBitmap.getByteAsInteger(refByteIndex + yOffset) << 1 : 0);
+                        ? referenceBitmap.getByteUnsigned(refByteIndex + yOffset) << 1 : 0);
             }
 
             if (currentLine > -2 && currentLine < (referenceBitmap.getHeight() - 1))
             {
                 nextReferenceLine = (nextReferenceLine << 8) | (refReadNextByte
-                        ? referenceBitmap.getByteAsInteger(refByteIndex + refRowStride + yOffset)
+                        ? referenceBitmap.getByteUnsigned(refByteIndex + refRowStride + yOffset)
                         : 0);
             }
 
@@ -695,7 +695,7 @@ public class GenericRefinementRegion implements Region
 
         if (lineNumber > 0)
         {
-            previousLine = regionBitmap.getByteAsInteger(byteIndex - rowStride);
+            previousLine = regionBitmap.getByteUnsigned(byteIndex - rowStride);
         }
         else
         {
@@ -705,7 +705,7 @@ public class GenericRefinementRegion implements Region
         if (currentLine > 0 && currentLine <= referenceBitmap.getHeight())
         {
             previousReferenceLine = referenceBitmap
-                    .getByteAsInteger(byteIndex - refRowStride + deltaRefStride) << 2;
+                    .getByteUnsigned(byteIndex - refRowStride + deltaRefStride) << 2;
         }
         else
         {
@@ -714,7 +714,7 @@ public class GenericRefinementRegion implements Region
 
         if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
         {
-            currentReferenceLine = referenceBitmap.getByteAsInteger(byteIndex + deltaRefStride);
+            currentReferenceLine = referenceBitmap.getByteUnsigned(byteIndex + deltaRefStride);
         }
         else
         {
@@ -724,7 +724,7 @@ public class GenericRefinementRegion implements Region
         if (currentLine > -2 && currentLine < (referenceBitmap.getHeight() - 1))
         {
             nextReferenceLine = referenceBitmap
-                    .getByteAsInteger(byteIndex + refRowStride + deltaRefStride);
+                    .getByteUnsigned(byteIndex + refRowStride + deltaRefStride);
         }
         else
         {
@@ -751,26 +751,26 @@ public class GenericRefinementRegion implements Region
             if (lineNumber > 0)
             {
                 previousLine = (previousLine << 8) | (readNextByte
-                        ? regionBitmap.getByteAsInteger(byteIndex - rowStride + 1) : 0);
+                        ? regionBitmap.getByteUnsigned(byteIndex - rowStride + 1) : 0);
             }
 
             if (currentLine > 0 && currentLine <= referenceBitmap.getHeight())
             {
                 previousReferenceLine = (previousReferenceLine << 8)
                         | (refReadNextByte ? referenceBitmap
-                                .getByteAsInteger(refByteIndex - refRowStride + yOffset) << 2 : 0);
+                                .getByteUnsigned(refByteIndex - refRowStride + yOffset) << 2 : 0);
             }
 
             if (currentLine >= 0 && currentLine < referenceBitmap.getHeight())
             {
                 currentReferenceLine = (currentReferenceLine << 8) | (refReadNextByte
-                        ? referenceBitmap.getByteAsInteger(refByteIndex + yOffset) : 0);
+                        ? referenceBitmap.getByteUnsigned(refByteIndex + yOffset) : 0);
             }
 
             if (currentLine > -2 && currentLine < (referenceBitmap.getHeight() - 1))
             {
                 nextReferenceLine = (nextReferenceLine << 8) | (refReadNextByte
-                        ? referenceBitmap.getByteAsInteger(refByteIndex + refRowStride + yOffset)
+                        ? referenceBitmap.getByteUnsigned(refByteIndex + refRowStride + yOffset)
                         : 0);
             }
 

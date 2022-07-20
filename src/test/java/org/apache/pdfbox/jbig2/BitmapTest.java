@@ -74,8 +74,8 @@ public class BitmapTest
         bitmap.setByte(0, byteValue);
         bitmap.setByte(31, byteValue);
 
-        assertEquals(integerValue, bitmap.getByteAsInteger(0));
-        assertEquals(integerValue, bitmap.getByteAsInteger(31));
+        assertEquals(integerValue, bitmap.getByteUnsigned(0));
+        assertEquals(integerValue, bitmap.getByteUnsigned(31));
 
     }
 

@@ -319,12 +319,12 @@ public class GenericRegion implements Region
 
         if (lineNumber >= 1)
         {
-            line1 = regionBitmap.getByteAsInteger(idx);
+            line1 = regionBitmap.getByteUnsigned(idx);
         }
 
         if (lineNumber >= 2)
         {
-            line2 = regionBitmap.getByteAsInteger(idx - rowStride) << 6;
+            line2 = regionBitmap.getByteUnsigned(idx - rowStride) << 6;
         }
 
         context = (line1 & 0xf0) | (line2 & 0x3800);
@@ -340,13 +340,13 @@ public class GenericRegion implements Region
             if (lineNumber > 0)
             {
                 line1 = (line1 << 8)
-                        | (nextByte < width ? regionBitmap.getByteAsInteger(idx + 1) : 0);
+                        | (nextByte < width ? regionBitmap.getByteUnsigned(idx + 1) : 0);
             }
 
             if (lineNumber > 1)
             {
                 line2 = (line2 << 8) | (nextByte < width
-                        ? regionBitmap.getByteAsInteger(idx - rowStride + 1) << 6 : 0);
+                        ? regionBitmap.getByteUnsigned(idx - rowStride + 1) << 6 : 0);
             }
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
@@ -386,12 +386,12 @@ public class GenericRegion implements Region
 
         if (lineNumber >= 1)
         {
-            line1 = regionBitmap.getByteAsInteger(idx);
+            line1 = regionBitmap.getByteUnsigned(idx);
         }
 
         if (lineNumber >= 2)
         {
-            line2 = regionBitmap.getByteAsInteger(idx - rowStride) << 6;
+            line2 = regionBitmap.getByteUnsigned(idx - rowStride) << 6;
         }
 
         context = (line1 & 0xf0) | (line2 & 0x3800);
@@ -407,13 +407,13 @@ public class GenericRegion implements Region
             if (lineNumber > 0)
             {
                 line1 = (line1 << 8)
-                        | (nextByte < width ? regionBitmap.getByteAsInteger(idx + 1) : 0);
+                        | (nextByte < width ? regionBitmap.getByteUnsigned(idx + 1) : 0);
             }
 
             if (lineNumber > 1)
             {
                 line2 = (line2 << 8) | (nextByte < width
-                        ? regionBitmap.getByteAsInteger(idx - rowStride + 1) << 6 : 0);
+                        ? regionBitmap.getByteUnsigned(idx - rowStride + 1) << 6 : 0);
             }
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
@@ -453,12 +453,12 @@ public class GenericRegion implements Region
 
         if (lineNumber >= 1)
         {
-            line1 = regionBitmap.getByteAsInteger(idx);
+            line1 = regionBitmap.getByteUnsigned(idx);
         }
 
         if (lineNumber >= 2)
         {
-            line2 = regionBitmap.getByteAsInteger(idx - rowStride) << 5;
+            line2 = regionBitmap.getByteUnsigned(idx - rowStride) << 5;
         }
 
         context = ((line1 >> 1) & 0x1f8) | ((line2 >> 1) & 0x1e00);
@@ -474,13 +474,13 @@ public class GenericRegion implements Region
             if (lineNumber >= 1)
             {
                 line1 = (line1 << 8)
-                        | (nextByte < width ? regionBitmap.getByteAsInteger(idx + 1) : 0);
+                        | (nextByte < width ? regionBitmap.getByteUnsigned(idx + 1) : 0);
             }
 
             if (lineNumber >= 2)
             {
                 line2 = (line2 << 8) | (nextByte < width
-                        ? regionBitmap.getByteAsInteger(idx - rowStride + 1) << 5 : 0);
+                        ? regionBitmap.getByteUnsigned(idx - rowStride + 1) << 5 : 0);
             }
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
@@ -519,12 +519,12 @@ public class GenericRegion implements Region
 
         if (lineNumber >= 1)
         {
-            line1 = regionBitmap.getByteAsInteger(idx);
+            line1 = regionBitmap.getByteUnsigned(idx);
         }
 
         if (lineNumber >= 2)
         {
-            line2 = regionBitmap.getByteAsInteger(idx - rowStride) << 4;
+            line2 = regionBitmap.getByteUnsigned(idx - rowStride) << 4;
         }
 
         context = ((line1 >> 3) & 0x7c) | ((line2 >> 3) & 0x380);
@@ -540,13 +540,13 @@ public class GenericRegion implements Region
             if (lineNumber >= 1)
             {
                 line1 = (line1 << 8)
-                        | (nextByte < width ? regionBitmap.getByteAsInteger(idx + 1) : 0);
+                        | (nextByte < width ? regionBitmap.getByteUnsigned(idx + 1) : 0);
             }
 
             if (lineNumber >= 2)
             {
                 line2 = (line2 << 8) | (nextByte < width
-                        ? regionBitmap.getByteAsInteger(idx - rowStride + 1) << 4 : 0);
+                        ? regionBitmap.getByteUnsigned(idx - rowStride + 1) << 4 : 0);
             }
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
@@ -584,7 +584,7 @@ public class GenericRegion implements Region
 
         if (lineNumber >= 1)
         {
-            line1 = regionBitmap.getByteAsInteger(idx);
+            line1 = regionBitmap.getByteUnsigned(idx);
         }
 
         context = (line1 >> 1) & 0x70;
@@ -600,7 +600,7 @@ public class GenericRegion implements Region
             if (lineNumber >= 1)
             {
                 line1 = (line1 << 8)
-                        | (nextByte < width ? regionBitmap.getByteAsInteger(idx + 1) : 0);
+                        | (nextByte < width ? regionBitmap.getByteUnsigned(idx + 1) : 0);
             }
 
             for (int minorX = 0; minorX < minorWidth; minorX++)
