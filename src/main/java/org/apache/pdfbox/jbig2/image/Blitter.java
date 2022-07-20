@@ -318,6 +318,7 @@ public final class Blitter
             }
     
             dst[out] = (byte)(~headMask & dst[out] | headMask & ~(dst[out] ^ reg >> shiftDelta));
+            //dst[out] ^= (dst[out] ^ ~(dst[out] ^ reg >> shiftDelta)) & headMask;
     
             if ( fullBytes==0 ) {
                 // do nothing
@@ -332,6 +333,7 @@ public final class Blitter
             if ( tailBits!=0 ) {
                 reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
                 dst[++out] = (byte)(~tailMask & dst[out] | tailMask & ~(dst[out] ^ reg >> shiftDelta));
+                //dst[++out] ^= (dst[out] ^ ~(dst[out] ^ reg >> shiftDelta)) & tailMask;
             }
             
             in  = srcOffset += srcRowStride;
@@ -353,6 +355,7 @@ public final class Blitter
             }
     
             dst[out] = (byte)(~headMask & dst[out] | headMask & reg >> shiftDelta);
+            //dst[out] ^= (dst[out] ^ reg >> shiftDelta) & headMask;
     
             if ( fullBytes==0 ) {
                 // do nothing
@@ -369,6 +372,7 @@ public final class Blitter
             if ( tailBits!=0 ) {
                 reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
                 dst[++out] = (byte)(~tailMask & dst[out] | tailMask & reg >> shiftDelta);
+                //dst[++out] ^= (dst[out] ^ reg >> shiftDelta) & tailMask;
             }
             
             in  = srcOffset += srcRowStride;
@@ -393,6 +397,7 @@ public final class Blitter
             }
     
             dst[out] = (byte)(~headMask & dst[out] | headMask & ~(reg >> shiftDelta));
+            //dst[out] ^= (dst[out] ^ ~reg >> shiftDelta) & headMask;
     
             if ( fullBytes==0 ) {
                 // do nothing
@@ -407,6 +412,7 @@ public final class Blitter
             if ( tailBits!=0 ) {
                 reg = reg << 8 | (shiftDelta>=tailBits ? 0 : src[in++] & 0xff);
                 dst[++out] = (byte)(~tailMask & dst[out] | tailMask & ~(reg >> shiftDelta));
+                //dst[++out] ^= (dst[out] ^ ~reg >> shiftDelta) & tailMask;
             }
             
             in  = srcOffset += srcRowStride;
