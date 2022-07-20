@@ -49,13 +49,12 @@ final class BitmapScanline extends Scanline
         int srcByteIdx = bitmap.getByteIndex(x, y);
         while (x < length)
         {
-            final byte srcByte = (byte) ~bitmap.getByte(srcByteIdx++);
-            final int bits = w - x > 8 ? 8 : w - x;
-            for (int bitPosition = bits - 1; bitPosition >= 0; bitPosition--, x++)
-            {
-                if (((srcByte >> bitPosition) & 0x1) != 0)
-                    lineBuffer[x] = 255;
-            }
+            int srcByte = ~bitmap.getByte(srcByteIdx++) << 23;
+        	for ( int c = Math.min(w - x, 8); c>0; c-- )
+        	{
+//        	    lineBuffer[x++] = (srcByte <<= 1) >> 8 >>> 23;
+        	    lineBuffer[x++] = (srcByte <<= 1) >> 31 & 0xff; 
+        	}
         }
     }
 
