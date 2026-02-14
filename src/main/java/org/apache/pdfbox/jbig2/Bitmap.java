@@ -258,7 +258,7 @@ public class Bitmap
     {
         Arrays.fill(bitmap, fillByte);
     }
-    
+
     @Override
     public boolean equals(Object obj)
     {
@@ -268,9 +268,44 @@ public class Bitmap
             return false;
         }
         Bitmap other = (Bitmap)obj;
-        return Arrays.equals(bitmap, other.bitmap);
+        if (Arrays.equals(bitmap, other.bitmap))
+        {
+            return true;
+        }
+        // the last byte can have differences e.g. because XNOR puts 1 in unused parts
+        // maybe pixel difference
+        if (width != other.width || height != other.height)
+        {
+            return false;
+        }
+        if ((width % 8) == 0)
+        {
+            return false; // no extra bits, thus unequal for sure
+        }
+        int p = (rowStride - 1) * 8; // index of first pixel in last byte
+        for (int y = 0; y < height; ++y)
+        {
+            // compare stride except last byte
+            int idx = getByteIndex(0, y);
+            for (int i = idx; i < idx + rowStride - 1; ++i)
+            {
+                if (bitmap[i] != other.bitmap[i])
+                {
+                    return false;
+                }
+            }
+            // compare the last bits
+            for (int x = p; x < width; ++x)
+            {
+                if (getPixel(x, y) != other.getPixel(x, y))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
-    
+
     /**
      * Copy parts of the underlying array of a Bitmap to another Bitmap.
      *  
